@@ -1,162 +1,196 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doorstuur Website</title>
-    <style>
-        /* Algemene stijl */
-        body {
-            background-color: #1f1f1f; /* Bijna zwart */
-            color: white;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            flex-direction: column;
-            animation: fadeIn 1.5s ease-out;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>lucasmangroelal.nl</title>
+  <style>
+    :root {
+      --accent: #FFD66B;
+      --text: #ffffff;
+      --bg: #1b1b1b;
+      --glow: #fff9c4;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        h1 {
-            font-size: 3em;
-            margin-bottom: 30px;
-            animation: fadeIn 2s ease-out;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-        /* Knoppen container */
-        .emoji-button-container {
-            position: relative;
-            display: inline-block;
-            margin: 15px;
-        }
+    .typewriter {
+      font-size: 2.6em;
+      margin-bottom: 40px;
+      position: relative;
+      display: inline-block;
+      letter-spacing: 1px;
+    }
 
-        /* Stijl van de knoppen */
-        .emoji-button {
-            background-color: #FFD66B;
-            border: none;
-            padding: 15px 30px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            position: relative;
-            z-index: 10;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            width: 100%;
-            max-width: 350px;
-        }
+    .typewriter::after {
+      content: "";
+      position: absolute;
+      height: 100%;
+      width: 3px;
+      background: var(--accent);
+      animation: blink 0.8s infinite;
+      right: -10px;
+      top: 0;
+    }
 
-        .emoji-button:active {
-            transform: scale(0.95);
-        }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
 
-        /* Hover effecten (alleen voor desktop) */
-        @media (hover: hover) {
-            .emoji-button:hover {
-                transform: scale(1.1);
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-            }
+    .letter {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: popIn 0.5s forwards;
+    }
 
-            .emoji-button:hover + .emoji-animations {
-                opacity: 1;
-            }
-        }
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
 
-        /* Emoji animaties container */
-        .emoji-animations {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            gap: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
+    .emoji-button-container {
+      position: relative;
+      margin: 30px;
+    }
 
-        .emoji {
-            font-size: 35px;
-            opacity: 0;
-            transform: translateY(0);
-            transition: transform 0.5s ease, opacity 0.5s ease;
-        }
+    .emoji-button {
+      background: transparent;
+      border: 2px solid var(--accent);
+      padding: 18px 35px;
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 14px;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      transition: 0.4s ease all;
+    }
 
-        /* Emoji animatie */
-        .emoji-button:hover + .emoji-animations .emoji:nth-child(1) {
-            opacity: 1;
-            transform: translate(-30px, -30px);
-        }
+    .emoji-button:hover {
+      background-color: var(--accent);
+      color: #000;
+      transform: scale(1.05);
+      box-shadow: 0 0 18px var(--glow);
+    }
 
-        .emoji-button:hover + .emoji-animations .emoji:nth-child(2) {
-            opacity: 1;
-            transform: translate(30px, -30px);
-        }
+    .emoji-animations {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      pointer-events: none;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      opacity: 0;
+    }
 
-        .emoji-button:hover + .emoji-animations .emoji:nth-child(3) {
-            opacity: 1;
-            transform: translate(-30px, 30px);
-        }
+    .emoji-button-container:hover .emoji-animations {
+      transform: translateX(-50%) translateY(-10px);
+      opacity: 1;
+    }
 
-        .emoji-button:hover + .emoji-animations .emoji:nth-child(4) {
-            opacity: 1;
-            transform: translate(30px, 30px);
-        }
+    .emoji {
+      font-size: 24px;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: floatUp 0.5s forwards;
+    }
 
-        /* Mobielvriendelijke aanpassingen */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2.2em;
-            }
+    .emoji-button-container:hover .emoji:nth-child(1) { animation-delay: 0.1s; }
+    .emoji-button-container:hover .emoji:nth-child(2) { animation-delay: 0.2s; }
+    .emoji-button-container:hover .emoji:nth-child(3) { animation-delay: 0.3s; }
+    .emoji-button-container:hover .emoji:nth-child(4) { animation-delay: 0.4s; }
 
-            .emoji-button {
-                font-size: 18px;
-                padding: 12px 20px;
-                max-width: 300px;
-            }
+    @keyframes floatUp {
+      0% {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
 
-            .emoji {
-                font-size: 30px;
-            }
+    @media (max-width: 600px) {
+      .typewriter {
+        font-size: 2em;
+      }
 
-            /* Verberg de tweede knop op mobiel */
-            .emoji-button-container:nth-of-type(2) {
-                display: none;
-            }
-        }
-    </style>
+      .emoji-button {
+        font-size: 16px;
+        padding: 14px 24px;
+      }
+
+      .emoji {
+        font-size: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div>
-        <h1>Hoi, ik ben lucasmangroelal</h1>
-        <a href="https://portfolio.lucasmangroelal.nl" class="emoji-button-container" target="_blank">
-            <button class="emoji-button">Bekijk mijn portfolio</button>
-            <div class="emoji-animations">
-                <span class="emoji">🧑‍💻</span>
-                <span class="emoji">😎</span>
-                <span class="emoji">💼</span>
-                <span class="emoji">🪪</span>
-            </div>
-        </a>
-        <a href="https://lucaskit.lucasmangroelal.nl" class="emoji-button-container" target="_blank">
-            <button class="emoji-button">Bekijk mijn eerste open-source tool</button>
-            <div class="emoji-animations">
-                <span class="emoji">💻</span>
-                <span class="emoji">👾</span>
-                <span class="emoji">🚀</span>
-                <span class="emoji">🔨</span>
-            </div>
-        </a>
+
+  <h1 class="typewriter" id="typing"></h1>
+
+  <a href="https://portfolio.lucasmangroelal.nl" class="emoji-button-container" target="_blank">
+    <div class="emoji-animations">
+      <span class="emoji">🧑‍💻</span>
+      <span class="emoji">😎</span>
+      <span class="emoji">💼</span>
+      <span class="emoji">🪪</span>
     </div>
+    <button class="emoji-button">Bekijk mijn portfolio</button>
+  </a>
+
+  <a href="https://lucaskit.lucasmangroelal.nl" class="emoji-button-container" target="_blank">
+    <div class="emoji-animations">
+      <span class="emoji">💻</span>
+      <span class="emoji">👾</span>
+      <span class="emoji">🚀</span>
+      <span class="emoji">🔨</span>
+    </div>
+    <button class="emoji-button">Open LucasKit</button>
+  </a>
+
+  <script>
+    const text = "Hoi, ik ben lucasmangroelal";
+    const target = document.getElementById("typing");
+
+    text.split("").forEach((char, i) => {
+      const span = document.createElement("span");
+      span.classList.add("letter");
+      span.style.animationDelay = `${i * 0.05}s`;
+      span.innerHTML = char === " " ? "&nbsp;" : char;
+      target.appendChild(span);
+    });
+  </script>
 </body>
 </html>
