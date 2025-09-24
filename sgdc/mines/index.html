@@ -8,10 +8,12 @@
   <style>
     :root{
       --bg:#0e1023;--panel:#171a37;--card:#141736;--text:#e8ecff;--muted:#a2a9d6;
-      --accent:#f4b73b;--good:#4bd37b;--warn:#ff6b6b;--border:rgba(255,255,255,.12);--shadow:0 10px 30px rgba(0,0,0,.35);
+      --accent:#f4b73b;--good:#4bd37b;--warn:#ff6b6b;--border:rgba(255,255,255,.12);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --glow:#7c8bff;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
 
     /* Topbar */
     .topbar{background:rgba(23,26,55,.9);backdrop-filter:blur(10px);
@@ -22,7 +24,7 @@
     .ghost:hover{background:rgba(255,255,255,.06)}
     .balance{font-weight:800;color:var(--good)}
 
-    /* Page layout */
+    /* Layout */
     .wrap{max-width:1100px;margin:20px auto;padding:0 16px;display:grid;grid-template-columns:360px 1fr;gap:18px}
     @media (max-width:900px){ .wrap{grid-template-columns:1fr} }
 
@@ -30,40 +32,89 @@
     .title{margin:0 0 10px}
     .muted{color:var(--muted)}
 
-    /* Controls */
+    /* Inputs */
     .group{display:grid;gap:14px}
-    .input{display:flex;align-items:center;gap:8px;background:#0b0d25;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .input{display:flex;align-items:center;gap:8px;background:#0b0d25;border:1px solid var(--border);border-radius:12px;padding:10px 12px;transition:.2s}
     .input:focus-within{border-color:#ffffff33;box-shadow:0 0 0 3px #ffffff14}
     .input input, .input select{flex:1;background:transparent;border:0;color:var(--text);font:inherit;outline:none;min-width:0}
-    .suffix{opacity:.85;font-weight:700}
+    .suffix{opacity:.9;font-weight:800}
 
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .btn{padding:10px 14px;border:none;border-radius:12px;font-weight:800;cursor:pointer}
+    /* Buttons */
+    .btn{padding:10px 14px;border:none;border-radius:12px;font-weight:800;cursor:pointer;transition:.15s transform}
+    .btn:active{transform:translateY(1px)}
     .btn.primary{background:var(--accent);color:#2a1b00}
     .btn.secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
     .btn:disabled{opacity:.6;cursor:not-allowed}
 
+    /* KPI chips */
     .kpis{display:flex;flex-wrap:wrap;gap:10px}
-    .chip{background:rgba(255,255,255,.08);padding:8px 10px;border-radius:12px}
+    .chip{background:rgba(255,255,255,.08);padding:8px 10px;border-radius:12px;display:inline-flex;gap:6px;align-items:center}
     .kpi{font-weight:800}
 
-    /* Range sliders */
-    .range{display:grid;gap:6px}
-    .range-line{display:flex;align-items:center;gap:10px}
-    .bubble{background:#0b0d25;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-weight:700;min-width:48px;text-align:center}
-    input[type="range"]{appearance:none;width:100%;height:14px;background:transparent}
-    input[type="range"]::-webkit-slider-runnable-track{height:6px;background:linear-gradient(90deg,#ffd774,#f8b93d);border-radius:999px}
-    input[type="range"]::-moz-range-track{height:6px;background:linear-gradient(90deg,#ffd774,#f8b93d);border-radius:999px}
-    input[type="range"]::-webkit-slider-thumb{appearance:none;margin-top:-6px;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #2a1b00;box-shadow:0 2px 10px rgba(0,0,0,.4)}
-    input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #2a1b00;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+    /* Board + Animations */
+    .board{position:relative;background:#0b0d25;border:1px solid var(--border);border-radius:16px;padding:14px;overflow:hidden}
+    .board::after{ /* subtle moving glow */
+      content:""; position:absolute; inset:-40% -10%; background:radial-gradient(600px 200px at var(--x,50%) var(--y,50%), rgba(124,139,255,.10), transparent 60%);
+      pointer-events:none; mix-blend-mode:screen; transition: .2s;
+      animation: glowShift 7s ease-in-out infinite alternate;
+    }
+    @keyframes glowShift{ 0%{transform:translateX(-6%)} 100%{transform:translateX(6%)} }
 
-    /* Board */
-    .board{position:relative;background:#0b0d25;border:1px solid var(--border);border-radius:16px;padding:14px}
-    .grid{display:grid;gap:8px;margin-top:8px}
-    .cell{aspect-ratio:1 / 1;border-radius:10px;background:#0f1330;border:1px solid rgba(255,255,255,.08);display:grid;place-items:center;font-size:1.2rem;font-weight:800;cursor:pointer;transition:transform .08s ease,background .2s}
+    .grid{display:grid;gap:8px;margin-top:8px;animation: boardIn .4s ease both}
+    @keyframes boardIn{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+
+    .cell{
+      aspect-ratio:1/1;border-radius:10px;background:#0f1330;border:1px solid rgba(255,255,255,.10);
+      display:grid;place-items:center;font-size:1.25rem;font-weight:800;cursor:pointer;
+      transform-style:preserve-3d; perspective:800px; transition:transform .08s ease, background .2s, box-shadow .2s;
+      position:relative; overflow:hidden;
+    }
     .cell:hover{transform:translateY(-2px)}
-    .cell.revealed.safe{background:#1b2258}
-    .cell.revealed.bomb{background:#3d0f1c}
+    .cell.revealed{transform:rotateY(180deg)}
+    .cell.safe{background:#121a4a;box-shadow:0 0 0 0 rgba(124,139,255,0);animation:safePop .18s ease}
+    @keyframes safePop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+    .cell.safe::after{ /* sparkles */
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        radial-gradient(6px 6px at 20% 30%, rgba(255,255,255,.65), transparent),
+        radial-gradient(5px 5px at 70% 40%, rgba(255,255,255,.55), transparent),
+        radial-gradient(4px 4px at 40% 70%, rgba(255,255,255,.45), transparent);
+      opacity:0; animation:sparkle .7s ease .05s both;
+    }
+    @keyframes sparkle{0%{opacity:0; transform:scale(.5)}30%{opacity:1}100%{opacity:0; transform:scale(1.4)}}
+
+    .cell.bomb{background:#3d0f1c; animation:boom .35s ease both}
+    @keyframes boom{0%{transform:translateZ(0)} 30%{transform:translateZ(0) scale(1.02)} 100%{transform:translateZ(0)}}
+    .shake{animation:shake .5s ease both}
+    @keyframes shake{
+      10%,90%{transform:translateX(-1px)}
+      20%,80%{transform:translateX(2px)}
+      30%,50%,70%{transform:translateX(-4px)}
+      40%,60%{transform:translateX(4px)}
+    }
+
+    /* Neon edge highlight when hovering board */
+    .board:hover{box-shadow:0 0 0 1px rgba(124,139,255,.25), 0 0 40px -12px rgba(124,139,255,.35) inset}
+
+    /* Ripple on click */
+    .ripple{
+      position:absolute; border-radius:50%; transform:translate(-50%,-50%); pointer-events:none;
+      width:8px; height:8px; background:radial-gradient(circle, rgba(255,255,255,.5), transparent 60%);
+      animation:ripple .6s ease-out forwards;
+    }
+    @keyframes ripple{ from{opacity:.9; transform:translate(-50%,-50%) scale(.5)} to{opacity:0; transform:translate(-50%,-50%) scale(6)} }
+
+    /* Confetti */
+    .confetti{position:fixed;left:0;top:0;width:100vw;height:0;overflow:visible;pointer-events:none;z-index:20}
+    .piece{
+      position:absolute; width:8px; height:12px; opacity:.9;
+      animation:fall linear forwards;
+    }
+    @keyframes fall{
+      to{ transform:translateY(110vh) rotate(720deg); opacity:1 }
+    }
+
     .statusline{margin-top:10px}
 
     /* Toast */
@@ -89,12 +140,14 @@
       <h2 class="title">Instellingen</h2>
 
       <div class="row">
+        <!-- Bet -->
         <label class="input" title="Inzet in Bits">
           <span>Inzet</span>
           <input type="number" id="bet" min="1" step="1" value="10" inputmode="numeric" />
           <span class="suffix">Bits</span>
         </label>
 
+        <!-- Size -->
         <label class="input" title="Rastergrootte">
           <span>Grootte</span>
           <select id="size">
@@ -106,14 +159,12 @@
         </label>
       </div>
 
-      <div class="range" title="Aantal bommen op het bord">
-        <div class="range-line">
-          <span>Bommen</span>
-          <input type="range" id="bombs" min="1" max="10" step="1" value="5" />
-          <span class="bubble" id="bombsOut">5</span>
-        </div>
-        <span class="muted">Max past zich aan op de gekozen grootte.</span>
-      </div>
+      <!-- Bombs INPUT (geen slider) -->
+      <label class="input" title="Aantal bommen (1 t/m N*N-1)">
+        <span>Bommen</span>
+        <input type="number" id="bombs" min="1" step="1" value="5" inputmode="numeric" />
+        <span class="suffix" id="bombsMaxHint">max: 24</span>
+      </label>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn primary" id="startBtn">Start spel</button>
@@ -131,9 +182,10 @@
     </section>
 
     <!-- RIGHT: Board -->
-    <section class="card board">
+    <section class="card board" id="boardCard">
       <h2 class="title" style="margin-bottom:6px">Bord</h2>
       <div id="grid" class="grid" style="grid-template-columns:repeat(5,1fr)"></div>
+      <svg class="confetti" id="confetti"></svg>
     </section>
   </main>
 
@@ -146,13 +198,16 @@
     document.getElementById("bitsNow").textContent  = v;
   });
 
-  // UI refs
+  // Refs
   const sizeEl   = document.getElementById('size');
   const bombsEl  = document.getElementById('bombs');
-  const bombsOut = document.getElementById('bombsOut');
+  const bombsHint= document.getElementById('bombsMaxHint');
   const betEl    = document.getElementById('bet');
 
   const gridEl   = document.getElementById('grid');
+  const board    = document.getElementById('boardCard');
+  const confetti = document.getElementById('confetti');
+
   const safeEl   = document.getElementById('safeCount');
   const multEl   = document.getElementById('multNow');
   const payoutEl = document.getElementById('payoutNow');
@@ -162,7 +217,7 @@
   const cashBtn  = document.getElementById('cashBtn');
   const resetBtn = document.getElementById('resetBtn');
 
-  // Game state
+  // State
   let state = null; // { n, bombs, bet, bombSet:Set, opened:Set, safe, playing }
 
   // Helpers
@@ -172,78 +227,122 @@
     t.textContent=msg; t.classList.add("show");
     setTimeout(()=>t.classList.remove("show"), 1200);
   }
-  function buildGrid(n){
-    gridEl.innerHTML=''; gridEl.style.gridTemplateColumns=`repeat(${n},1fr)`;
-    for(let i=0;i<n*n;i++){
-      const d=document.createElement('button');
-      d.type='button'; d.className='cell'; d.dataset.i=i;
-      d.addEventListener('click',()=>onCell(i,d));
-      gridEl.appendChild(d);
-    }
+
+  // Fancy board glow follows mouse
+  board.addEventListener('pointermove', (e)=>{
+    const r = board.getBoundingClientRect();
+    const x = (e.clientX - r.left)/r.width*100;
+    const y = (e.clientY - r.top)/r.height*100;
+    board.style.setProperty('--x', x+'%');
+    board.style.setProperty('--y', y+'%');
+  });
+
+  function ripple(el, x, y){
+    const r = document.createElement('div');
+    r.className='ripple'; r.style.left=x+'px'; r.style.top=y+'px';
+    el.appendChild(r); setTimeout(()=> r.remove(), 650);
   }
 
-  // Fair multiplier: mult(k) = Π_{i=0..k-1} (N-i)/(S-i)
+  // Confetti
+  function launchConfetti(){
+    confetti.innerHTML = '';
+    const colors = ['#ffd774','#f8b93d','#8a7cff','#4bd37b','#ff6b6b','#7c8bff'];
+    const pieces = 80;
+    for(let i=0;i<pieces;i++){
+      const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('class','piece');
+      rect.setAttribute('x', Math.random()*window.innerWidth);
+      rect.setAttribute('y', -20 - Math.random()*200);
+      rect.setAttribute('width', 6 + Math.random()*8);
+      rect.setAttribute('height', 8 + Math.random()*10);
+      rect.setAttribute('fill', colors[i % colors.length]);
+      rect.style.animationDuration = (0.9 + Math.random()*0.9) + 's';
+      rect.style.animationDelay    = (Math.random()*0.2)+'s';
+      rect.style.transformOrigin   = 'center';
+      confetti.appendChild(rect);
+    }
+    // auto clear
+    setTimeout(()=> confetti.innerHTML='', 1800);
+  }
+
+  // Multiplier (fair)
   function fairMultiplier(N,S,k){
     if(k<=0) return 1;
     let m = 1;
     for(let i=0;i<k;i++){
-      const num = (N - i);
-      const den = (S - i);
-      if(den <= 0) return Infinity; // onmogelijk meer safe
+      const num = (N - i), den = (S - i);
+      if(den <= 0) return Infinity;
       m *= (num/den);
     }
     return m;
   }
 
+  function buildGrid(n){
+    gridEl.innerHTML=''; gridEl.style.gridTemplateColumns=`repeat(${n},1fr)`;
+    const cells = n*n;
+    for(let i=0;i<cells;i++){
+      const d=document.createElement('button');
+      d.type='button'; d.className='cell'; d.dataset.i=i;
+      d.addEventListener('click',(ev)=>onCell(i,d,ev));
+      gridEl.appendChild(d);
+      // Staggered appear
+      d.style.animation = `boardIn .4s ease ${Math.random()*0.12}s both`;
+    }
+  }
+
+  function updateLimits(){
+    const n = parseInt(sizeEl.value,10);
+    const maxBombs = Math.max(1, n*n - 1);
+    bombsEl.max = maxBombs;
+    bombsEl.value = clamp(parseInt(bombsEl.value,10)||5, 1, maxBombs);
+    bombsHint.textContent = `max: ${maxBombs}`;
+  }
+
   function updateDerived(){
     const bet = Math.max(1, parseInt(betEl.value,10) || 10);
     const n   = parseInt(sizeEl.value,10);
-    const b   = parseInt(bombsEl.value,10);
+    const b   = clamp(parseInt(bombsEl.value,10) || 5, 1, n*n - 1);
+    bombsEl.value = b; // ensure clamped
     const N   = n*n;
     const S   = N - b;
     const k   = state?.safe ?? 0;
 
     const mult = fairMultiplier(N,S,k);
     const payout = Math.floor(bet * (mult === Infinity ? 0 : mult));
-
     safeEl.textContent = k;
     multEl.textContent = (mult === Infinity ? '∞' : mult.toFixed(2) + '×');
     payoutEl.textContent = payout;
   }
 
-  function applySizeLimits(){
-    const n = parseInt(sizeEl.value,10);
-    const maxBombs = Math.max(1, n*n - 1);
-    bombsEl.max = maxBombs;
-    bombsEl.value = clamp(parseInt(bombsEl.value,10)||5, 1, maxBombs);
-    bombsOut.textContent = bombsEl.value;
-  }
+  // Control events
+  sizeEl.addEventListener('change', ()=>{ updateLimits(); buildGrid(parseInt(sizeEl.value,10)); updateDerived(); });
+  bombsEl.addEventListener('input',  ()=>{ updateDerived(); });
+  betEl  .addEventListener('input',  ()=>{ updateDerived(); });
 
-  // Events for controls
-  sizeEl.addEventListener('change', ()=>{ applySizeLimits(); buildGrid(parseInt(sizeEl.value,10)); updateDerived(); });
-  bombsEl.addEventListener('input', ()=>{ bombsOut.textContent=bombsEl.value; updateDerived(); });
-  betEl.addEventListener('input',  ()=> updateDerived());
-
-  // Start / Cash / Reset
+  // Game
   function startGame(){
     const n     = parseInt(sizeEl.value,10);
-    const bombs = parseInt(bombsEl.value,10);
+    const bombs = clamp(parseInt(bombsEl.value,10)||5, 1, n*n-1);
     const bet   = Math.max(1, parseInt(betEl.value,10)||10);
 
-    if(!Bits.spend(bet)){ statusEl.textContent='Niet genoeg Bits'; statusEl.style.color='var(--warn)'; showToast('Niet genoeg Bits'); return; }
+    if(!Bits.spend(bet)){ statusEl.textContent='Niet genoeg Bits'; statusEl.style.color='var(--warn)'; showToast('Niet genoeg Bits'); board.classList.add('shake'); setTimeout(()=>board.classList.remove('shake'), 520); return; }
 
     state = { n, bombs, bet, bombSet:new Set(), opened:new Set(), safe:0, playing:true };
     while(state.bombSet.size < bombs) state.bombSet.add(Math.floor(Math.random()*n*n));
     buildGrid(n);
+    cashBtn.disabled = true;
     statusEl.textContent = `Spel gestart — inzet ${bet} Bits`;
     statusEl.style.color = 'var(--muted)';
-    cashBtn.disabled = true;
     updateDerived();
   }
 
-  function onCell(i, el){
+  function onCell(i, el, ev){
     if(!state?.playing || state.opened.has(i)) return;
     state.opened.add(i);
+
+    // ripple effect
+    const r = el.getBoundingClientRect();
+    ripple(el, ev.clientX - r.left, ev.clientY - r.top);
 
     const isBomb = state.bombSet.has(i);
     el.classList.add('revealed', isBomb ? 'bomb' : 'safe');
@@ -253,6 +352,7 @@
       revealAll();
       statusEl.textContent = '💥 Verloren!';
       statusEl.style.color = 'var(--warn)';
+      board.classList.add('shake'); setTimeout(()=>board.classList.remove('shake'), 520);
       state.playing = false;
       cashBtn.disabled = true;
       updateDerived();
@@ -260,16 +360,15 @@
     }
 
     state.safe++;
+    cashBtn.disabled = false;
     statusEl.textContent = 'Veilig! Je kunt nu cashen.';
     statusEl.style.color = 'var(--muted)';
-    cashBtn.disabled = false;
     updateDerived();
   }
 
   function cashOut(){
     if(!state?.playing) return;
-    const n = state.n, b = state.bombs;
-    const N = n*n, S = N - b, k = state.safe;
+    const n = state.n, b = state.bombs, N = n*n, S = N - b, k = state.safe;
     const mult = fairMultiplier(N,S,k);
     const payout = Math.floor(state.bet * (mult === Infinity ? 0 : mult));
     Bits.add(payout);
@@ -280,11 +379,14 @@
     revealAll();
     cashBtn.disabled = true;
     updateDerived();
+    launchConfetti();
   }
 
   function revealAll(){
+    const n = state.n;
     Array.from(gridEl.children).forEach((cell, idx) => {
-      if(state.bombSet.has(idx)){ cell.textContent='💣'; cell.classList.add('revealed','bomb'); }
+      const isBomb = state.bombSet.has(idx);
+      if(isBomb){ cell.textContent='💣'; cell.classList.add('revealed','bomb'); }
       else if(!cell.textContent){ cell.textContent='💎'; cell.classList.add('revealed','safe'); }
     });
   }
@@ -298,12 +400,13 @@
     updateDerived();
   }
 
+  // Buttons
   startBtn.addEventListener('click', startGame);
   cashBtn .addEventListener('click', cashOut);
   resetBtn.addEventListener('click', resetUI);
 
   // Init
-  applySizeLimits();
+  updateLimits();
   buildGrid(parseInt(sizeEl.value,10));
   updateDerived();
 </script>
