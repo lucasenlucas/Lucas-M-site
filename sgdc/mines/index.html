@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SGDC Live — Mines</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0e1023;--panel:#171a37;--card:#141736;--text:#e8ecff;--muted:#a2a9d6;
+      --accent:#f4b73b;--good:#4bd37b;--warn:#ff6b6b;--border:rgba(255,255,255,.12);--shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+
+    /* Topbar */
+    .topbar{background:rgba(23,26,55,.9);backdrop-filter:blur(10px);
+      display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .brand img{width:28px;height:28px;border-radius:6px}
+    .ghost{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:10px;text-decoration:none}
+    .ghost:hover{background:rgba(255,255,255,.06)}
+    .balance{font-weight:800;color:var(--good)}
+
+    /* Page layout */
+    .wrap{max-width:1100px;margin:20px auto;padding:0 16px;display:grid;grid-template-columns:360px 1fr;gap:18px}
+    @media (max-width:900px){ .wrap{grid-template-columns:1fr} }
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+    .title{margin:0 0 10px}
+    .muted{color:var(--muted)}
+
+    /* Controls */
+    .group{display:grid;gap:14px}
+    .input{display:flex;align-items:center;gap:8px;background:#0b0d25;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+    .input:focus-within{border-color:#ffffff33;box-shadow:0 0 0 3px #ffffff14}
+    .input input, .input select{flex:1;background:transparent;border:0;color:var(--text);font:inherit;outline:none;min-width:0}
+    .suffix{opacity:.85;font-weight:700}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .btn{padding:10px 14px;border:none;border-radius:12px;font-weight:800;cursor:pointer}
+    .btn.primary{background:var(--accent);color:#2a1b00}
+    .btn.secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+
+    .kpis{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{background:rgba(255,255,255,.08);padding:8px 10px;border-radius:12px}
+    .kpi{font-weight:800}
+
+    /* Range sliders */
+    .range{display:grid;gap:6px}
+    .range-line{display:flex;align-items:center;gap:10px}
+    .bubble{background:#0b0d25;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-weight:700;min-width:48px;text-align:center}
+    input[type="range"]{appearance:none;width:100%;height:14px;background:transparent}
+    input[type="range"]::-webkit-slider-runnable-track{height:6px;background:linear-gradient(90deg,#ffd774,#f8b93d);border-radius:999px}
+    input[type="range"]::-moz-range-track{height:6px;background:linear-gradient(90deg,#ffd774,#f8b93d);border-radius:999px}
+    input[type="range"]::-webkit-slider-thumb{appearance:none;margin-top:-6px;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #2a1b00;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+    input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #2a1b00;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+
+    /* Board */
+    .board{position:relative;background:#0b0d25;border:1px solid var(--border);border-radius:16px;padding:14px}
+    .grid{display:grid;gap:8px;margin-top:8px}
+    .cell{aspect-ratio:1 / 1;border-radius:10px;background:#0f1330;border:1px solid rgba(255,255,255,.08);display:grid;place-items:center;font-size:1.2rem;font-weight:800;cursor:pointer;transition:transform .08s ease,background .2s}
+    .cell:hover{transform:translateY(-2px)}
+    .cell.revealed.safe{background:#1b2258}
+    .cell.revealed.bomb{background:#3d0f1c}
+    .statusline{margin-top:10px}
+
+    /* Toast */
+    .toast{position:fixed;bottom:16px;right:16px;background:#1b233f;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transition:.2s}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+  <script src="../js/bits.js"></script>
+
+  <header class="topbar">
+    <a href="../" class="ghost">← Terug</a>
+    <div class="brand">
+      <img src="https://groep8sgdc.nl/wp-content/uploads/2022/09/s-Gravendreef-scholen07-01-18-1.png" alt="SGDC logo">
+      Mines
+    </div>
+    <div class="balance">Bits: <span id="bitsValue">0</span></div>
+  </header>
+
+  <main class="wrap">
+    <!-- LEFT: Controls -->
+    <section class="card group">
+      <h2 class="title">Instellingen</h2>
+
+      <div class="row">
+        <label class="input" title="Inzet in Bits">
+          <span>Inzet</span>
+          <input type="number" id="bet" min="1" step="1" value="10" inputmode="numeric" />
+          <span class="suffix">Bits</span>
+        </label>
+
+        <label class="input" title="Rastergrootte">
+          <span>Grootte</span>
+          <select id="size">
+            <option value="5">5×5</option>
+            <option value="6">6×6</option>
+            <option value="7">7×7</option>
+            <option value="8">8×8</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="range" title="Aantal bommen op het bord">
+        <div class="range-line">
+          <span>Bommen</span>
+          <input type="range" id="bombs" min="1" max="10" step="1" value="5" />
+          <span class="bubble" id="bombsOut">5</span>
+        </div>
+        <span class="muted">Max past zich aan op de gekozen grootte.</span>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn primary" id="startBtn">Start spel</button>
+        <button class="btn secondary" id="cashBtn" disabled>Cash out</button>
+        <button class="btn secondary" id="resetBtn">Opnieuw</button>
+      </div>
+
+      <div class="kpis">
+        <span class="chip">Beschikbaar: <span class="kpi" id="bitsNow">0</span> Bits</span>
+        <span class="chip">Veilig: <span class="kpi" id="safeCount">0</span></span>
+        <span class="chip">Multiplier: <span class="kpi" id="multNow">1.00×</span></span>
+        <span class="chip">Cash-out: <span class="kpi" id="payoutNow">0</span> Bits</span>
+      </div>
+      <div class="statusline muted" id="statusMsg"></div>
+    </section>
+
+    <!-- RIGHT: Board -->
+    <section class="card board">
+      <h2 class="title" style="margin-bottom:6px">Bord</h2>
+      <div id="grid" class="grid" style="grid-template-columns:repeat(5,1fr)"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // Bits hookup
+  Bits.onChange(v => {
+    document.getElementById("bitsValue").textContent = v;
+    document.getElementById("bitsNow").textContent  = v;
+  });
+
+  // UI refs
+  const sizeEl   = document.getElementById('size');
+  const bombsEl  = document.getElementById('bombs');
+  const bombsOut = document.getElementById('bombsOut');
+  const betEl    = document.getElementById('bet');
+
+  const gridEl   = document.getElementById('grid');
+  const safeEl   = document.getElementById('safeCount');
+  const multEl   = document.getElementById('multNow');
+  const payoutEl = document.getElementById('payoutNow');
+  const statusEl = document.getElementById('statusMsg');
+
+  const startBtn = document.getElementById('startBtn');
+  const cashBtn  = document.getElementById('cashBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  // Game state
+  let state = null; // { n, bombs, bet, bombSet:Set, opened:Set, safe, playing }
+
+  // Helpers
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function showToast(msg){
+    const t=document.getElementById("toast");
+    t.textContent=msg; t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 1200);
+  }
+  function buildGrid(n){
+    gridEl.innerHTML=''; gridEl.style.gridTemplateColumns=`repeat(${n},1fr)`;
+    for(let i=0;i<n*n;i++){
+      const d=document.createElement('button');
+      d.type='button'; d.className='cell'; d.dataset.i=i;
+      d.addEventListener('click',()=>onCell(i,d));
+      gridEl.appendChild(d);
+    }
+  }
+
+  // Fair multiplier: mult(k) = Π_{i=0..k-1} (N-i)/(S-i)
+  function fairMultiplier(N,S,k){
+    if(k<=0) return 1;
+    let m = 1;
+    for(let i=0;i<k;i++){
+      const num = (N - i);
+      const den = (S - i);
+      if(den <= 0) return Infinity; // onmogelijk meer safe
+      m *= (num/den);
+    }
+    return m;
+  }
+
+  function updateDerived(){
+    const bet = Math.max(1, parseInt(betEl.value,10) || 10);
+    const n   = parseInt(sizeEl.value,10);
+    const b   = parseInt(bombsEl.value,10);
+    const N   = n*n;
+    const S   = N - b;
+    const k   = state?.safe ?? 0;
+
+    const mult = fairMultiplier(N,S,k);
+    const payout = Math.floor(bet * (mult === Infinity ? 0 : mult));
+
+    safeEl.textContent = k;
+    multEl.textContent = (mult === Infinity ? '∞' : mult.toFixed(2) + '×');
+    payoutEl.textContent = payout;
+  }
+
+  function applySizeLimits(){
+    const n = parseInt(sizeEl.value,10);
+    const maxBombs = Math.max(1, n*n - 1);
+    bombsEl.max = maxBombs;
+    bombsEl.value = clamp(parseInt(bombsEl.value,10)||5, 1, maxBombs);
+    bombsOut.textContent = bombsEl.value;
+  }
+
+  // Events for controls
+  sizeEl.addEventListener('change', ()=>{ applySizeLimits(); buildGrid(parseInt(sizeEl.value,10)); updateDerived(); });
+  bombsEl.addEventListener('input', ()=>{ bombsOut.textContent=bombsEl.value; updateDerived(); });
+  betEl.addEventListener('input',  ()=> updateDerived());
+
+  // Start / Cash / Reset
+  function startGame(){
+    const n     = parseInt(sizeEl.value,10);
+    const bombs = parseInt(bombsEl.value,10);
+    const bet   = Math.max(1, parseInt(betEl.value,10)||10);
+
+    if(!Bits.spend(bet)){ statusEl.textContent='Niet genoeg Bits'; statusEl.style.color='var(--warn)'; showToast('Niet genoeg Bits'); return; }
+
+    state = { n, bombs, bet, bombSet:new Set(), opened:new Set(), safe:0, playing:true };
+    while(state.bombSet.size < bombs) state.bombSet.add(Math.floor(Math.random()*n*n));
+    buildGrid(n);
+    statusEl.textContent = `Spel gestart — inzet ${bet} Bits`;
+    statusEl.style.color = 'var(--muted)';
+    cashBtn.disabled = true;
+    updateDerived();
+  }
+
+  function onCell(i, el){
+    if(!state?.playing || state.opened.has(i)) return;
+    state.opened.add(i);
+
+    const isBomb = state.bombSet.has(i);
+    el.classList.add('revealed', isBomb ? 'bomb' : 'safe');
+    el.textContent = isBomb ? '💣' : '💎';
+
+    if(isBomb){
+      revealAll();
+      statusEl.textContent = '💥 Verloren!';
+      statusEl.style.color = 'var(--warn)';
+      state.playing = false;
+      cashBtn.disabled = true;
+      updateDerived();
+      return;
+    }
+
+    state.safe++;
+    statusEl.textContent = 'Veilig! Je kunt nu cashen.';
+    statusEl.style.color = 'var(--muted)';
+    cashBtn.disabled = false;
+    updateDerived();
+  }
+
+  function cashOut(){
+    if(!state?.playing) return;
+    const n = state.n, b = state.bombs;
+    const N = n*n, S = N - b, k = state.safe;
+    const mult = fairMultiplier(N,S,k);
+    const payout = Math.floor(state.bet * (mult === Infinity ? 0 : mult));
+    Bits.add(payout);
+    showToast('+'+payout+' Bits');
+    statusEl.textContent = `Uitbetaald ${payout} Bits`;
+    statusEl.style.color = 'var(--good)';
+    state.playing = false;
+    revealAll();
+    cashBtn.disabled = true;
+    updateDerived();
+  }
+
+  function revealAll(){
+    Array.from(gridEl.children).forEach((cell, idx) => {
+      if(state.bombSet.has(idx)){ cell.textContent='💣'; cell.classList.add('revealed','bomb'); }
+      else if(!cell.textContent){ cell.textContent='💎'; cell.classList.add('revealed','safe'); }
+    });
+  }
+
+  function resetUI(){
+    state = null;
+    statusEl.textContent = '';
+    statusEl.style.color = 'var(--muted)';
+    cashBtn.disabled = true;
+    buildGrid(parseInt(sizeEl.value,10));
+    updateDerived();
+  }
+
+  startBtn.addEventListener('click', startGame);
+  cashBtn .addEventListener('click', cashOut);
+  resetBtn.addEventListener('click', resetUI);
+
+  // Init
+  applySizeLimits();
+  buildGrid(parseInt(sizeEl.value,10));
+  updateDerived();
+</script>
+</body>
+</html>
