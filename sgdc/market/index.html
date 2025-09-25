@@ -8,28 +8,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="icon" href="https://groep8sgdc.nl/wp-content/uploads/2022/09/s-Gravendreef-scholen07-01-18-1.png"/>
 
   <style>
     :root{
       --bg:#0e1023; --panel:#171a37; --card:#141736; --text:#e8ecff; --muted:#a2a9d6;
-      --good:#4bd37b; --bad:#ff6b6b; --border:rgba(255,255,255,.10);
-      --shadow:0 10px 30px rgba(0,0,0,.35);
-      --pill:#ffffff1a;
+      --good:#4bd37b; --bad:#ff6b6b; --border:rgba(255,255,255,.10); --shadow:0 10px 30px rgba(0,0,0,.35); --pill:#ffffff1a;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
     .nav-wrap{position:sticky;top:0;z-index:50;background:rgba(16,18,41,.75);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08)}
     .nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 16px}
     .brand{display:flex;align-items:center;gap:10px;font-weight:800}
-    .brand .logo{width:38px;height:38px;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
-    .brand .logo img{width:100%;height:100%;object-fit:contain}
     .spacer{flex:1}
     .balance{font-weight:800;color:var(--good);white-space:nowrap}
     .back{border:1px solid var(--border);background:#ffffff12;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--text)}
 
     .container{max-width:1200px;margin:0 auto;padding:20px 16px 56px}
-
     .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
     .box{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
     .box .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -46,8 +40,7 @@
     .name{font-weight:800}
     .ticker{font-size:12px;color:var(--muted)}
     .pill{background:var(--pill);border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
-    .pill.up{color:var(--good)}
-    .pill.down{color:var(--bad)}
+    .pill.up{color:var(--good)} .pill.down{color:var(--bad)}
 
     .pos-table{width:100%;border-collapse:collapse;margin-top:12px}
     .pos-table th,.pos-table td{padding:10px;border-bottom:1px dashed #ffffff1a;font-size:14px;text-align:left}
@@ -58,16 +51,10 @@
   </style>
 </head>
 <body>
-  <!-- (optioneel) Bits helper -->
-  <script src="/js/bits.js"></script>
-
   <div class="nav-wrap">
     <nav class="nav">
-      <a class="back" href="/">← Terug</a>
-      <div class="brand">
-        <div class="logo"><img src="https://groep8sgdc.nl/wp-content/uploads/2022/09/s-Gravendreef-scholen07-01-18-1.png" alt="SGDC"/></div>
-        <div>SGDC Live — Market</div>
-      </div>
+      <a class="back" href="../">← Terug</a>
+      <div class="brand">SGDC Live — Market</div>
       <div class="spacer"></div>
       <div class="balance">Bits: <span id="bitsHeader">0</span></div>
     </nav>
@@ -122,10 +109,17 @@
     </section>
   </main>
 
-  <script src="/market/market.js"></script>
+  <!-- scripts -->
+  <script src="../js/bits.js"></script>
+  <script src="./market.js?v=2"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Tabs
+      if(!window.Market){
+        document.getElementById('assetGrid').innerHTML =
+          `<div class="card"><div>⚠️ Kan <code>market.js</code> niet laden. Check het script-pad.</div></div>`;
+        return;
+      }
+
       const tabMarket = document.getElementById('tabMarket');
       const tabWallet = document.getElementById('tabWallet');
       const marketView = document.getElementById('marketView');
@@ -133,13 +127,12 @@
 
       function showMarket(){ tabMarket.classList.add('active'); tabWallet.classList.remove('active'); marketView.style.display='block'; walletView.style.display='none'; }
       function showWallet(){ tabWallet.classList.add('active'); tabMarket.classList.remove('active'); walletView.style.display='block'; marketView.style.display='none'; }
-      tabMarket.onclick = showMarket;
-      tabWallet.onclick = showWallet;
+      tabMarket.onclick = showMarket; tabWallet.onclick = showWallet;
 
-      // Header & summary render
       function renderSummary(){
-        document.getElementById('bitsHeader').textContent = Market.bits.get();
-        document.getElementById('bitsWallet').textContent = Market.bits.get();
+        const bits = Market.bits.get();
+        document.getElementById('bitsHeader').textContent = bits;
+        document.getElementById('bitsWallet').textContent = bits;
 
         const invested = Market.portfolioValue();
         document.getElementById('bitsInvested').textContent = invested;
@@ -150,26 +143,25 @@
         el.textContent = (pct>=0?'+':'') + pct.toFixed(2) + '%';
         el.style.color = pct>=0 ? 'var(--good)' : 'var(--bad)';
 
-        document.getElementById('walletFree').textContent = Market.bits.get();
+        document.getElementById('walletFree').textContent = bits;
         document.getElementById('walletLocked').textContent = invested;
-        document.getElementById('walletTotal').textContent = Market.bits.get() + invested;
+        document.getElementById('walletTotal').textContent = bits + invested;
       }
 
-      // Market grid
       function renderGrid(){
         const wrap = document.getElementById('assetGrid');
         wrap.innerHTML = Market.symbols().map(sym=>{
           const a = Market.assets[sym];
           const pct = ((a.price - a.yClose)/a.yClose)*100;
           const cls = pct>=0 ? 'up':'down';
-          const meta = Market.meta[sym];
+          const m = Market.meta[sym];
           return `
-            <a class="card" href="/market/asset.html?symbol=${encodeURIComponent(sym)}">
+            <a class="card" href="./asset.html?symbol=${encodeURIComponent(sym)}">
               <div class="row">
                 <div style="display:flex;gap:10px;align-items:center">
-                  <div class="pill" style="border:none;background:#ffffff22">${meta.ui.icon || '📦'}</div>
+                  <div class="pill" style="border:none;background:#ffffff22">${m.ui.icon || '📦'}</div>
                   <div>
-                    <div class="name">${meta.name}</div>
+                    <div class="name">${m.name}</div>
                     <div class="ticker">${sym}</div>
                   </div>
                 </div>
@@ -183,7 +175,6 @@
         }).join('');
       }
 
-      // Wallet positions table
       function renderPositions(){
         const body = document.getElementById('posBody');
         const rows = [];
@@ -201,7 +192,7 @@
                 ${plAbs>=0?'+':''}${plAbs.toFixed(2)} (${plPct>=0?'+':''}${plPct.toFixed(2)}%)
               </td>
               <td class="actions">
-                <a class="btn" href="/market/asset.html?symbol=${encodeURIComponent(sym)}">Beheer</a>
+                <a class="btn" href="./asset.html?symbol=${encodeURIComponent(sym)}">Beheer</a>
               </td>
             </tr>
           `);
@@ -209,10 +200,8 @@
         body.innerHTML = rows.length? rows.join('') : `<tr><td colspan="6" class="text-muted">Nog geen posities.</td></tr>`;
       }
 
-      // Main loop
       function loop(){
         Market.tickAll();
-        // “Hold” effect: 70% kans UI refresh, 30% even vasthouden
         if(Math.random()<0.70){
           renderSummary();
           renderGrid();
@@ -221,14 +210,9 @@
         requestAnimationFrame(loop);
       }
 
-      // Init FIRST, then initial render
-      Market.init();
-      renderSummary();
-      renderGrid();
-      renderPositions();
-      loop();
+      Market.init();              // seed assets + lange history
+      renderSummary(); renderGrid(); renderPositions(); loop();
 
-      // Klik op wallet box = naar wallet tab
       document.getElementById('boxWallet').onclick = showWallet;
     });
   </script>
