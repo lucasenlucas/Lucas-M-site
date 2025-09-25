@@ -13,34 +13,46 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,system-ui,sans-serif;background:radial-gradient(1200px 600px at 10% -10%,#14183d 0,#0E1023 60%);color:var(--text)}
 
+/* Topbar */
 .nav{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
-.back{border:1px solid var(--border);background:#ffffff14;padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--text);font-weight:600}
+.back{border:1px solid var(--border);background:#ffffff14;padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;transition:.2s}
+.back:hover{background:#ffffff28}
 .spacer{flex:1}
-.balance{font-weight:800;color:var(--good)}
-.help{cursor:pointer;font-weight:800;border:1px solid var(--border);background:#ffffff14;padding:8px 12px;border-radius:12px}
+.balance{font-weight:800;color:var(--good);transition:color .5s}
+.help{cursor:pointer;font-weight:800;border:1px solid var(--border);background:#ffffff14;padding:8px 12px;border-radius:12px;transition:.2s}
+.help:hover{background:#ffffff28}
 
+/* Boxes */
 .container{max-width:1200px;margin:0 auto;padding:22px 16px 64px}
 .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-.box{background:linear-gradient(180deg,var(--panel),#111431);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.box{background:linear-gradient(180deg,var(--panel),#111431);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:var(--shadow);transition:transform .3s}
+.box.highlight{outline:2px solid #8a7cff;transform:scale(1.05)}
 .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .value{margin-top:6px;font-weight:800;font-size:22px}
+
+/* Coins grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;margin-top:18px}
-.card{background:linear-gradient(180deg,var(--card),#101432);border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);display:block;transition:transform .18s ease, border-color .18s ease}
-.card:hover{transform:translateY(-4px);border-color:#ffffff2e}
+.card{background:linear-gradient(180deg,var(--card),#101432);border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);display:block;transition:transform .2s, border-color .2s}
+.card:hover{transform:translateY(-4px) scale(1.02);border-color:#ffffff2e}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .name{font-weight:800}
 .ticker{font-size:12px;color:var(--muted)}
-.pill{background:#ffffff1a;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
-.pill.up{color:var(--good)} .pill.down{color:var(--bad)}
+.pill{background:#ffffff1a;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px;transition:.3s}
+.pill.up{color:var(--good);animation:pulseUp 1s}
+.pill.down{color:var(--bad);animation:pulseDown 1s}
+@keyframes pulseUp{0%{background:#4BD37B44}100%{background:#ffffff1a}}
+@keyframes pulseDown{0%{background:#FF6B6B44}100%{background:#ffffff1a}}
 
 /* Onboarding overlay */
 #onboard{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:9999}
-.on-card{background:#15193A;border-radius:20px;padding:24px;max-width:500px;width:90%;color:var(--text);box-shadow:var(--shadow);text-align:center}
+.on-card{background:#15193A;border-radius:20px;padding:24px;max-width:500px;width:90%;color:var(--text);box-shadow:var(--shadow);text-align:center;animation:fadeIn .4s}
 .on-card h2{margin:0 0 12px;font-size:22px}
 .on-card p{margin:0 0 18px;color:var(--muted)}
 .on-buttons{display:flex;justify-content:center;gap:10px}
-.on-btn{background:#8a7cff;border:none;padding:10px 16px;border-radius:12px;font-weight:700;color:#fff;cursor:pointer}
+.on-btn{background:#8a7cff;border:none;padding:10px 16px;border-radius:12px;font-weight:700;color:#fff;cursor:pointer;transition:.2s}
+.on-btn:hover{transform:scale(1.05)}
 .on-btn.alt{background:#444}
+@keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 </style>
 </head>
 <body>
@@ -53,9 +65,9 @@ body{margin:0;font-family:Inter,system-ui,sans-serif;background:radial-gradient(
 
   <main class="container">
     <div class="summary">
-      <div class="box"><div class="label">Wallet</div><div class="value"><span id="bitsWallet">0</span> Bits</div></div>
-      <div class="box"><div class="label">Geïnvesteerd</div><div class="value"><span id="bitsInvested">0</span></div></div>
-      <div class="box"><div class="label">Markt vs gisteren</div><div class="value"><span id="marketDelta">0.00%</span></div></div>
+      <div class="box" id="boxWallet"><div class="label">Wallet</div><div class="value"><span id="bitsWallet">0</span> Bits</div></div>
+      <div class="box" id="boxInvested"><div class="label">Geïnvesteerd</div><div class="value"><span id="bitsInvested">0</span></div></div>
+      <div class="box" id="boxMarket"><div class="label">Markt vs gisteren</div><div class="value"><span id="marketDelta">0.00%</span></div></div>
     </div>
     <section class="grid" id="assetGrid"></section>
   </main>
@@ -73,24 +85,27 @@ body{margin:0;font-family:Inter,system-ui,sans-serif;background:radial-gradient(
   </div>
 
 <script>
-// --- Persistente Bits over pagina's heen ---
-const STORAGE_KEY = 'sgdc.bits';
-const balanceEl = document.getElementById('bitsHeader');
-let balance = Number.parseInt(localStorage.getItem(STORAGE_KEY) ?? '0', 10);
-if (Number.isNaN(balance)) balance = 0;
-function renderBits() { if (balanceEl) balanceEl.textContent = balance; document.getElementById('bitsWallet').textContent=balance; }
-function setBits(val){ balance=Math.max(0,Math.floor(Number(val)||0)); localStorage.setItem(STORAGE_KEY,String(balance)); renderBits(); }
-function addBits(a){ setBits(balance+Number(a||0)); }
-function resetBits(){ localStorage.removeItem(STORAGE_KEY); setBits(0); }
-window.sgdcBits={get:()=>balance,set:setBits,add:addBits,reset:resetBits,key:STORAGE_KEY};
+/* --- Bits API --- */
+const STORAGE_KEY='sgdc.bits';
+let balance=Number.parseInt(localStorage.getItem(STORAGE_KEY)??'100',10);
+if(Number.isNaN(balance)) balance=100;
+function renderBits(){document.getElementById('bitsHeader').textContent=balance;document.getElementById('bitsWallet').textContent=balance;}
+function setBits(v){balance=Math.max(0,Number(v)||0);localStorage.setItem(STORAGE_KEY,balance);renderBits();}
+window.sgdcBits={get:()=>balance,set:setBits,add:(a)=>setBits(balance+Number(a||0)),reset:()=>{localStorage.removeItem(STORAGE_KEY);setBits(100);},key:STORAGE_KEY};
 renderBits();
 
-// --- Market dummy data ---
+/* --- Assets --- */
 const assets=[
  {sym:"SNK",name:"Snacko",icon:"🍪",price:95,yClose:90},
  {sym:"FRIK",name:"Frikandelium",icon:"🌭",price:42,yClose:45},
  {sym:"COKE",name:"ColaCap",icon:"🥤",price:60,yClose:62},
- {sym:"BBIT",name:"Bitterbit",icon:"🟤",price:33,yClose:31}
+ {sym:"BBIT",name:"Bitterbit",icon:"🟤",price:33,yClose:31},
+ {sym:"HWK",name:"HwCoin",icon:"📚",price:25,yClose:26},
+ {sym:"TCH",name:"TeachToken",icon:"👩‍🏫",price:70,yClose:72},
+ {sym:"WIFI",name:"LaggyFi",icon:"📶",price:15,yClose:14},
+ {sym:"CHAIR",name:"ChairChain",icon:"🪑",price:8,yClose:9},
+ {sym:"CHZB",name:"CheezeBread",icon:"🧀",price:12,yClose:11},
+ {sym:"PPLX",name:"PartyPlex",icon:"🎉",price:140,yClose:130}
 ];
 function renderGrid(){
   const wrap=document.getElementById('assetGrid');
@@ -112,13 +127,14 @@ function renderGrid(){
 }
 renderGrid();
 
-// --- Onboarding ---
+/* --- Onboarding --- */
 const steps=[
  {t:"Welkom bij SGDC Market",x:"Hier gebruik je je Bits om te investeren in grappige coins."},
- {t:"Je Bits Wallet",x:"Bovenin zie je hoeveel Bits je hebt. Dit is je budget."},
- {t:"Coins",x:"Elke coin stijgt of daalt. Je ziet de waarde en procentuele verandering."},
- {t:"Kopen & Verkopen",x:"Klik op een coin om details en een grafiek te zien. Daar kun je kopen en verkopen."},
- {t:"Succes!",x:"Je bent klaar om te beginnen!"}
+ {t:"Je Wallet",x:"Hierboven zie je hoeveel Bits je hebt.",h:"#boxWallet"},
+ {t:"Investeringen",x:"Dit vak toont hoeveel Bits in coins zitten.",h:"#boxInvested"},
+ {t:"Marktstatus",x:"De markt vergelijkt vandaag met gisteren.",h:"#boxMarket"},
+ {t:"Coins",x:"Hier vind je alle coins. Klik om details te zien.",h:"#assetGrid"},
+ {t:"Succes!",x:"Je bent klaar om te starten!"}
 ];
 let step=0;
 const onboard=document.getElementById('onboard');
@@ -127,20 +143,18 @@ const onText=document.getElementById('onText');
 const onPrev=document.getElementById('onPrev');
 const onNext=document.getElementById('onNext');
 
+function clearHighlights(){document.querySelectorAll('.highlight').forEach(el=>el.classList.remove('highlight'));}
 function showStep(i){
-  step=i;
-  onTitle.textContent=steps[i].t;
-  onText.textContent=steps[i].x;
+  step=i;clearHighlights();
+  onTitle.textContent=steps[i].t;onText.textContent=steps[i].x;
+  if(steps[i].h){const el=document.querySelector(steps[i].h);if(el)el.classList.add('highlight');}
   onPrev.style.display=i>0?'inline-block':'none';
   onNext.textContent=i===steps.length-1?'Start!':'Volgende';
 }
 onPrev.onclick=()=>showStep(step-1);
-onNext.onclick=()=>{
-  if(step<steps.length-1) showStep(step+1);
-  else { onboard.style.display='none'; localStorage.setItem('sgdc.market.onboarded','1'); }
-};
-document.getElementById('helpBtn').onclick=()=>{onboard.style.display='flex';showStep(0);}
-if(!localStorage.getItem('sgdc.market.onboarded')){ onboard.style.display='flex'; showStep(0); }
+onNext.onclick=()=>{if(step<steps.length-1)showStep(step+1);else{onboard.style.display='none';clearHighlights();localStorage.setItem('sgdc.market.onboarded','1');}};
+document.getElementById('helpBtn').onclick=()=>{onboard.style.display='flex';showStep(0);};
+if(!localStorage.getItem('sgdc.market.onboarded')){onboard.style.display='flex';showStep(0);}
 </script>
 </body>
 </html>
