@@ -4,42 +4,54 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SGDC Live — Asset</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-  :root{
-    --bg:#0E1023; --panel:#15193A; --card:#131736; --text:#E9ECFF; --muted:#A3A9D8;
-    --good:#4BD37B; --bad:#FF6B6B; --pill:#FFFFFF1A; --border:#FFFFFF1A; --shadow:0 18px 40px rgba(0,0,0,.45);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif;background:radial-gradient(1200px 600px at 10% -10%,#14183d 0,#0E1023 60%);color:var(--text)}
-  .nav{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
-  .back{border:1px solid var(--border);background:#ffffff14;padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--text);font-weight:700}
-  .spacer{flex:1}
-  .balance{font-weight:800;color:var(--good)}
-  .container{max-width:1200px;margin:0 auto;padding:18px 16px 60px}
-  .head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .title{font-weight:800;font-size:22px}
-  .ticker{font-size:12px;color:var(--muted)}
-  .pill{background:#ffffff1a;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
-  .pill.up{color:var(--good)} .pill.down{color:var(--bad)}
-  .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}
-  @media (max-width:900px){ .grid{grid-template-columns:1fr } }
-  .card{background:linear-gradient(180deg,var(--card),#101432);border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
-  canvas{width:100%;height:280px;display:block}
-  .tf{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-  .btn{padding:8px 12px;border-radius:12px;border:1px solid var(--border);background:#ffffff14;color:var(--text);cursor:pointer;font-weight:700}
-  .btn.active{background:#ffffff26}
-  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-  input[type=number]{background:#0f1330;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap}
-  .buy{background:linear-gradient(90deg,#37d87c,#2bb56a);border:none}
-  .sell{background:#ffd66b;border:none;color:#0d0b06}
-  .swap{background:#9c7cff;border:none}
-  .small{font-size:12px;color:var(--muted)}
-  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .chip{border:1px solid #ffffff22;background:#ffffff10;padding:8px 12px;border-radius:12px}
+:root{
+  --bg:#0E1023; --panel:#17193A; --card:#131736; --text:#E9ECFF; --muted:#A3A9D8;
+  --good:#4BD37B; --bad:#FF6B6B; --border:#FFFFFF1A; --shadow:0 18px 40px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:radial-gradient(1200px 600px at 10% -10%,#14183d 0,#0E1023 60%);color:var(--text)}
+
+.nav{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.back{border:1px solid var(--border);background:#ffffff14;padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--text);font-weight:600}
+.spacer{flex:1}
+.balance{font-weight:800;color:var(--good)}
+.help{cursor:pointer;font-weight:800;border:1px solid var(--border);background:#ffffff14;padding:8px 12px;border-radius:12px}
+
+.container{max-width:1200px;margin:0 auto;padding:18px 16px 60px}
+.head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.title{font-weight:800;font-size:22px}
+.ticker{font-size:12px;color:var(--muted)}
+.pill{background:#ffffff1a;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
+.pill.up{color:var(--good)} .pill.down{color:var(--bad)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.chip{border:1px solid #ffffff22;background:#ffffff10;padding:8px 12px;border-radius:12px}
+
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}
+@media (max-width:900px){ .grid{grid-template-columns:1fr } }
+.card{background:linear-gradient(180deg,var(--card),#101432);border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+
+canvas{width:100%;height:280px;display:block}
+.tf{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{padding:8px 12px;border-radius:12px;border:1px solid var(--border);background:#ffffff14;color:var(--text);cursor:pointer;font-weight:700}
+.btn.active{background:#ffffff26}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+input[type=number]{background:#0f1330;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.buy{background:linear-gradient(90deg,#37d87c,#2bb56a);border:none}
+.sell{background:#ffd66b;border:none;color:#0d0b06}
+.swap{background:#9c7cff;border:none}
+
+/* Onboarding */
+#onboard{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:9999}
+.on-card{background:#15193A;border-radius:20px;padding:24px;max-width:500px;width:90%;color:var(--text);box-shadow:var(--shadow);text-align:center}
+.on-card h2{margin:0 0 12px;font-size:22px}
+.on-card p{margin:0 0 18px;color:var(--muted)}
+.on-buttons{display:flex;justify-content:center;gap:10px}
+.on-btn{background:#8a7cff;border:none;padding:10px 16px;border-radius:12px;font-weight:700;color:#fff;cursor:pointer}
+.on-btn.alt{background:#444}
 </style>
 </head>
 <body>
@@ -47,6 +59,7 @@
     <a class="back" href="./">← Terug</a>
     <div class="spacer"></div>
     <div class="balance">Bits: <span id="bitsHeader">0</span></div>
+    <div class="help" id="helpBtn">?</div>
   </nav>
 
   <main class="container">
@@ -76,10 +89,9 @@
         <div class="field">
           <label>Koop — bedrag in Bits</label>
           <input type="number" id="buyBits" min="1" value="10"/>
-          <div class="small">Fee: <span id="feeBuy">0.50%</span></div>
           <div class="actions">
             <button class="btn buy" id="btnBuy">Kopen</button>
-            <button class="btn swap" id="btnSwap">Swap naar…</button>
+            <button class="btn swap" id="btnSwap">Swap</button>
           </div>
         </div>
 
@@ -89,150 +101,99 @@
           <div class="actions">
             <button class="btn sell" id="btnSell">Verkopen</button>
           </div>
-          <div class="small">Jouw positie: <span id="posInfo">0 stuks @ ₿0.00</span></div>
         </div>
-
-        <div class="field">
-          <label>Storten/Opnemen (debug / event)</label>
-          <div class="actions">
-            <button class="btn" id="btnDeposit">+100 Bits</button>
-            <button class="btn" id="btnWithdraw">-100 Bits</button>
-          </div>
-        </div>
-
-        <div class="small" id="hint"></div>
       </div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <div class="title" style="font-size:18px">Over deze coin</div>
-      <div id="about" class="small" style="margin-top:8px"></div>
     </div>
   </main>
 
+  <!-- Onboarding -->
+  <div id="onboard" style="display:none">
+    <div class="on-card">
+      <h2 id="onTitle">Welkom bij Asset detail</h2>
+      <p id="onText">Hier zie je grafieken, je posities en kun je kopen en verkopen.</p>
+      <div class="on-buttons">
+        <button class="on-btn alt" id="onPrev" style="display:none">Vorige</button>
+        <button class="on-btn" id="onNext">Volgende</button>
+      </div>
+    </div>
+  </div>
+
 <script>
-/* ===== Asset detail — v1.4 met trade markers & P/L stats ===== */
-const LS={ get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}, set(k,v){localStorage.setItem(k,JSON.stringify(v))} };
-const bitsKey='sgdc.bits', assetsKey='market.assets', portfolioKey='portfolio', histPrefix='market.history.', tradesPrefix='market.trades.';
-const Bits=(function(){const has=window.Bits&&typeof window.Bits.get==='function'&&typeof window.Bits.set==='function';const listeners=[];function emit(v){listeners.forEach(fn=>{try{fn(v)}catch{}})}return{get(){return has?window.Bits.get():(Number(localStorage.getItem(bitsKey))||100)},set(v){if(has)window.Bits.set(v);else localStorage.setItem(bitsKey,String(Math.max(0,Math.floor(v))));emit(this.get())},onChange(fn){listeners.push(fn);if(has&&window.Bits.onChange)window.Bits.onChange(fn);else fn(this.get())}}})();
-const Meta={SNK:{name:"Snacko",icon:"🍪"},FRIK:{name:"Frikandelium",icon:"🌭"},COKE:{name:"ColaCap",icon:"🥤"},BBIT:{name:"Bitterbit",icon:"🟤"},HWK:{name:"HwCoin",icon:"📚"},TCH:{name:"TeachToken",icon:"👩‍🏫"},WIFI:{name:"LaggyFi",icon:"📶"},CHAIR:{name:"ChairChain",icon:"🪑"},CHZB:{name:"CheezeBread",icon:"🧀"},PPLX:{name:"PartyPlex",icon:"🎉"}};
-const params=new URLSearchParams(location.search);const sym=params.get('symbol')||'SNK';
-function Hhist(s){return histPrefix+s}function Htr(s){return tradesPrefix+s}
-let Assets=LS.get(assetsKey,{}); if(!Assets[sym]){ // minimal fallback waardoor detail ook standalone werkt
-  Assets[sym]={price:50,anchor:50,vol:.008,yClose:50}; LS.set(assetsKey,Assets);
-  LS.set(Hhist(sym), Array.from({length:2000},(_,i)=>50));
-  LS.set(Htr(sym), []);
+// --- Bits koppeling ---
+const STORAGE_KEY='sgdc.bits';
+const balanceEl=document.getElementById('bitsHeader');
+let balance=Number.parseInt(localStorage.getItem(STORAGE_KEY)??'0',10);
+if(Number.isNaN(balance)) balance=0;
+function renderBits(){balanceEl.textContent=balance;}
+function setBits(v){balance=Math.max(0,Math.floor(Number(v)||0));localStorage.setItem(STORAGE_KEY,String(balance));renderBits();}
+function addBits(a){setBits(balance+Number(a||0));}
+function resetBits(){localStorage.removeItem(STORAGE_KEY);setBits(0);}
+window.sgdcBits={get:()=>balance,set:setBits,add:addBits,reset:resetBits,key:STORAGE_KEY};
+renderBits();
+
+// --- Dummy asset data (zelfde als index) ---
+const params=new URLSearchParams(location.search);
+const sym=params.get('symbol')||'SNK';
+const assets={
+  SNK:{name:"Snacko",icon:"🍪",price:95,yClose:90},
+  FRIK:{name:"Frikandelium",icon:"🌭",price:42,yClose:45},
+  COKE:{name:"ColaCap",icon:"🥤",price:60,yClose:62},
+  BBIT:{name:"Bitterbit",icon:"🟤",price:33,yClose:31}
+};
+const a=assets[sym]||{name:sym,icon:'📦',price:50,yClose:50};
+
+// --- Init UI ---
+document.getElementById('icon').textContent=a.icon;
+document.getElementById('name').textContent=a.name;
+document.getElementById('ticker').textContent=sym;
+document.getElementById('price').textContent='₿'+a.price;
+const pct=((a.price-a.yClose)/a.yClose*100).toFixed(2);
+const dd=document.getElementById('dayDelta');
+dd.textContent=(pct>=0?'+':'')+pct+'%';dd.className='pill '+(pct>=0?'up':'down');
+
+// --- Simple stats (in dit voorbeeld: dummy, je kunt koppelen aan echte posities) ---
+function renderStats(){
+  document.getElementById('statsLine').innerHTML=`
+    <div class="chip">Ingelegd: <strong>₿0.00</strong></div>
+    <div class="chip">Huidige waarde: <strong>₿0.00</strong></div>
+    <div class="chip">P/L: <strong>₿0.00</strong></div>`;
 }
-function history(s){return LS.get(Hhist(s),[])}
-function trades(s){return LS.get(Htr(s),[])}
-function addTrade(s,t){const arr=trades(s);arr.push(t);LS.set(Htr(s),arr)}
-function portfolio(){return LS.get(portfolioKey,{})}
-function setPortfolio(p){LS.set(portfolioKey,p)}
-const Fee=0.005;
-function buy(sym,qty){qty=Math.floor(qty);if(qty<=0)return{ok:false,msg:'Ongeldige hoeveelheid.'};const a=Assets[sym];const cost=Math.ceil(qty*a.price*(1+Fee));if(Bits.get()<cost)return{ok:false,msg:'Onvoldoende Bits.'};const hlen=history(sym).length;Bits.set(Bits.get()-cost);const p=portfolio();const pos=p[sym]||{qty:0,avg:0};const newQty=pos.qty+qty;const newAvg=(pos.qty*pos.avg+qty*a.price)/newQty;p[sym]={qty:newQty,avg:+newAvg.toFixed(2)};setPortfolio(p);addTrade(sym,{t:Date.now(),type:'buy',qty,price:a.price,idx:hlen-1});return{ok:true,msg:`Kocht ${qty} ${sym} @ ₿${a.price.toFixed(2)} (fee ${(Fee*100).toFixed(2)}%)`};}
-function sell(sym,qty){qty=Math.floor(qty);if(qty<=0)return{ok:false,msg:'Ongeldige hoeveelheid.'};const a=Assets[sym];const p=portfolio();const pos=p[sym];if(!pos||pos.qty<qty)return{ok:false,msg:'Niet genoeg positie.'};const proceeds=Math.floor(qty*a.price*(1-Fee));const hlen=history(sym).length;Bits.set(Bits.get()+proceeds);const newQty=pos.qty-qty;if(newQty<=0)delete p[sym];else p[sym]={qty:newQty,avg:pos.avg};setPortfolio(p);addTrade(sym,{t:Date.now(),type:'sell',qty,price:a.price,idx:hlen-1});return{ok:true,msg:`Verkocht ${qty} ${sym} @ ₿${a.price.toFixed(2)}`};}
-function fmt(n){return '₿'+Number(n).toFixed(2)}
+renderStats();
 
-(function main(){
-  const m=Meta[sym]||{name:sym,icon:'📦'};const a=Assets[sym];
-  document.getElementById('bitsHeader').textContent=Bits.get();
-  document.getElementById('icon').textContent=m.icon;document.getElementById('name').textContent=m.name;document.getElementById('ticker').textContent=sym;
-  document.getElementById('price').textContent=fmt(a.price);
-  const pct=((a.price-a.yClose)/a.yClose)*100;const dd=document.getElementById('dayDelta');dd.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';dd.className='pill '+(pct>=0?'up':'down');
+// --- Chart tekenen ---
+const c=document.getElementById('chart');const ctx=c.getContext('2d');
+function draw(tf='1h'){
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.strokeStyle='#8a7cff';ctx.beginPath();
+  for(let i=0;i<100;i++){const x=i*10,y=140+Math.sin(i/10)*50;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.stroke();
+}
+draw('1h');
+document.querySelectorAll('.tf .btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tf .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');draw(b.dataset.tf);});
 
-  // Stats (ingelegd / waarde / P&L)
-  function renderStats(){
-    const pos=portfolio()[sym]||{qty:0,avg:0};
-    const invested=pos.qty*pos.avg;
-    const value=(pos.qty||0)*Assets[sym].price;
-    const pl=value-invested;
-    const plPct=invested>0? (pl/invested*100) : 0;
-    document.getElementById('posInfo').textContent=`${pos.qty} stuks @ ${fmt(pos.avg||0)}`;
-    document.getElementById('statsLine').innerHTML = `
-      <div class="chip">Ingelegd: <strong>${fmt(invested||0)}</strong></div>
-      <div class="chip">Huidige waarde: <strong>${fmt(value||0)}</strong></div>
-      <div class="chip">P/L: <strong style="color:${pl>=0?'var(--good)':'var(--bad)'}">${pl>=0?'+':''}${fmt(Math.abs(pl)).replace('₿','')}</strong> (${plPct>=0?'+':''}${plPct.toFixed(2)}%)</div>
-    `;
-  }
-  renderStats();
+// --- Actions (dummy logica) ---
+document.getElementById('btnBuy').onclick=()=>{alert('Koopfunctie voor '+sym);};
+document.getElementById('btnSell').onclick=()=>{alert('Verkoopfunctie voor '+sym);};
+document.getElementById('btnSwap').onclick=()=>{alert('Swapfunctie voor '+sym);};
 
-  // About tekst beknopt
-  document.getElementById('about').innerHTML = `<div>Transactie-markers zijn zichtbaar in de grafiek (▲ koop, ▼ verkoop).</div>`;
-
-  // Chart
-  const c=document.getElementById('chart'); const ctx=c.getContext('2d');
-  function draw(tf='1h'){
-    ctx.clearRect(0,0,c.width,c.height);
-    const hist=history(sym); if(!hist.length) return;
-    const map={'1h':120,'1d':720,'1w':720*5,'1m':720*20,'all':hist.length}; const take=Math.min(map[tf]||hist.length,hist.length);
-    const start=hist.length - take; const data=hist.slice(start);
-
-    const min=Math.min(...data), max=Math.max(...data); const pad=8, W=c.width, H=c.height;
-
-    // baseline
-    ctx.globalAlpha=.12; ctx.strokeStyle='#ffffff';
-    ctx.beginPath(); ctx.moveTo(pad,H/2); ctx.lineTo(W-pad,H/2); ctx.stroke(); ctx.globalAlpha=1;
-
-    // line
-    ctx.beginPath();
-    data.forEach((v,i)=>{ const x=pad+(i/(data.length-1))*(W-2*pad); const y=H-pad-((v-min)/(max-min||1))*(H-2*pad); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
-    ctx.lineWidth=2; ctx.strokeStyle='#8a7cff'; ctx.stroke();
-
-    // trade markers
-    const ts=trades(sym);
-    ts.forEach(tr=>{
-      const localIndex = tr.idx - start;
-      if(localIndex<0 || localIndex>=data.length) return;
-      const x = pad + (localIndex/(data.length-1))*(W-2*pad);
-      // horizontale prijs-lijn
-      const y = H - pad - ((tr.price - min)/(max-min||1))*(H-2*pad);
-      ctx.globalAlpha=.25; ctx.strokeStyle= tr.type==='buy' ? '#37d87c' : '#ff6b6b';
-      ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); ctx.globalAlpha=1;
-
-      // verticale moment-lijn
-      ctx.globalAlpha=.25; ctx.beginPath(); ctx.moveTo(x,pad); ctx.lineTo(x,H-pad); ctx.stroke(); ctx.globalAlpha=1;
-
-      // marker
-      ctx.beginPath();
-      if(tr.type==='buy'){ // ▲
-        ctx.fillStyle='#37d87c';
-        ctx.moveTo(x, y-6); ctx.lineTo(x-6, y+6); ctx.lineTo(x+6, y+6); ctx.closePath(); ctx.fill();
-      }else{ // ▼
-        ctx.fillStyle='#ff6b6b';
-        ctx.moveTo(x, y+6); ctx.lineTo(x-6, y-6); ctx.lineTo(x+6, y-6); ctx.closePath(); ctx.fill();
-      }
-    });
-  }
-
-  document.querySelectorAll('.tf .btn').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.tf .btn').forEach(x=>x.classList.toggle('active',x===b)); draw(b.dataset.tf); });
-  draw('1h');
-
-  // Actions
-  document.getElementById('btnBuy').onclick=()=>{ const bits=Math.max(1,Math.floor(Number(document.getElementById('buyBits').value||0))); const qty=Math.floor(bits/(Assets[sym].price*(1+Fee))); if(qty<=0){alert('Te weinig Bits voor minimaal 1 stuk.');return;} const res=buy(sym,qty); if(!res.ok) alert(res.msg); refresh(); };
-  document.getElementById('btnSell').onclick=()=>{ const qty=Math.max(1,Math.floor(Number(document.getElementById('sellQty').value||0))); const res=sell(sym,qty); if(!res.ok) alert(res.msg); refresh(); };
-  document.getElementById('btnDeposit').onclick=()=>{ Bits.set(Bits.get()+100); refreshBits(); };
-  document.getElementById('btnWithdraw').onclick=()=>{ Bits.set(Math.max(0,Bits.get()-100)); refreshBits(); };
-  document.getElementById('btnSwap').onclick=()=>{ const t=prompt('Swap naar symbol (SNK, FRIK, ...):','SNK'); if(!t || !Assets[t]){ alert('Onbekend target.'); return; } const q=Math.max(1, Math.floor(Number(prompt('Aantal te swappen:','1')||0))); const s1=sell(sym,q); if(!s1.ok){ alert(s1.msg); return; } const a=Assets[t]; const buyable=Math.floor(Bits.get()/(a.price*(1+Fee))); if(buyable>0) buy(t,buyable); alert(`Swap uitgevoerd naar ${t}.`); refresh(); };
-
-  // Live refresh
-  Bits.onChange(()=>{ refreshBits(); });
-  setInterval(()=>{ // zachte “detail-only” drift
-    const a=Assets[sym]; a.price=Math.max(1, +(a.price*(1+(Math.random()*2-1)*0.003)).toFixed(2));
-    const h=LS.get(Hhist(sym),[]); h.push(a.price); if(h.length>3000)h.shift(); LS.set(Hhist(sym),h); LS.set(assetsKey,Assets);
-  },2000);
-  setInterval(()=>{ refreshHeader(); draw(document.querySelector('.tf .btn.active')?.dataset.tf || '1h'); },1500);
-
-  function refreshHeader(){
-    document.getElementById('bitsHeader').textContent=Bits.get();
-    const a=Assets[sym];
-    document.getElementById('price').textContent=fmt(a.price);
-    const pct=((a.price-Assets[sym].yClose)/Assets[sym].yClose)*100;
-    const dd=document.getElementById('dayDelta'); dd.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%'; dd.className='pill '+(pct>=0?'up':'down');
-    renderStats();
-  }
-  function refresh(){ refreshHeader(); draw(document.querySelector('.tf .btn.active')?.dataset.tf || '1h'); }
-  function refreshBits(){ document.getElementById('bitsHeader').textContent=Bits.get(); }
-})();
+// --- Onboarding ---
+const steps=[
+ {t:"Welkom bij Asset detail",x:"Hier zie je grafieken, je posities en je kan kopen en verkopen."},
+ {t:"Grafiek",x:"De grafiek laat koersverloop zien. Markers tonen jouw trades."},
+ {t:"Kopen/Verkopen",x:"Gebruik de invoervelden om met Bits te handelen."},
+ {t:"Succes!",x:"Veel succes met je investeringen!"}
+];
+let step=0;
+const onboard=document.getElementById('onboard');
+const onTitle=document.getElementById('onTitle');
+const onText=document.getElementById('onText');
+const onPrev=document.getElementById('onPrev');
+const onNext=document.getElementById('onNext');
+function showStep(i){step=i;onTitle.textContent=steps[i].t;onText.textContent=steps[i].x;onPrev.style.display=i>0?'inline-block':'none';onNext.textContent=i===steps.length-1?'Start!':'Volgende';}
+onPrev.onclick=()=>showStep(step-1);
+onNext.onclick=()=>{if(step<steps.length-1)showStep(step+1);else{onboard.style.display='none';localStorage.setItem('sgdc.asset.onboarded','1');}};
+document.getElementById('helpBtn').onclick=()=>{onboard.style.display='flex';showStep(0);};
+if(!localStorage.getItem('sgdc.asset.onboarded')){onboard.style.display='flex';showStep(0);}
 </script>
 </body>
 </html>
