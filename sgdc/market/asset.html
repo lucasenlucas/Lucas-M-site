@@ -55,19 +55,6 @@ input[type=number]{background:#0f1330;color:var(--text);border:1px solid var(--b
 .on-btn:hover{transform:scale(1.05)}
 .on-btn.alt{background:#444}
 @keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-
-/* ===== Nieuw: verkoop op Bits UI ===== */
-.sell-easy label{font-weight:700;display:block;margin:.25rem 0}
-.sell-easy input{width:100%;padding:.7rem .9rem;border-radius:.8rem;background:#0f1330;color:#e8ecff;border:1px solid #2a2f52}
-.sell-easy .row{display:flex;gap:12px;align-items:center;margin:.6rem 0}
-.sell-easy .row input{flex:1}
-.sell-easy .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0 0}
-.sell-easy .chips .sep{width:1px;background:#2a2f52;height:28px;margin:0 .25rem}
-.sell-easy .chips button{padding:.45rem .7rem;border-radius:.7rem;border:1px solid #2a2f52;background:#171a37;color:#e8ecff;cursor:pointer}
-.sell-easy .chips button.ghost{background:transparent}
-.sell-easy .muted{color:#a2a9d6;display:block;margin-top:.25rem}
-.sell-easy .warn{margin-top:.4rem;background:#3a1120;border:1px solid #6b1f32;color:#ffd0d7;padding:.5rem .7rem;border-radius:.6rem}
-.sell-easy input.error{border-color:#ff6b6b;outline-color:#ff6b6b}
 </style>
 </head>
 <body>
@@ -116,35 +103,17 @@ input[type=number]{background:#0f1330;color:var(--text);border:1px solid var(--b
           </div>
         </div>
 
-        <!-- ===== Nieuw: Verkoop-denken-in-Bits ===== -->
-        <div id="sellCard" class="sell-easy">
-          <label>Verkoop — bedrag (in Bits)</label>
-          <input id="sellBits" type="number" step="0.01" min="0" placeholder="Bijv. 10">
-
-          <div class="chips">
-            <button data-bits="5">5</button>
-            <button data-bits="10">10</button>
-            <button data-bits="20">20</button>
-            <button data-bits="50">50</button>
-            <span class="sep"></span>
-            <button data-pct="25">25%</button>
-            <button data-pct="50">50%</button>
-            <button data-pct="100">Max</button>
-            <button id="breakeven" class="ghost">Inleg terug</button>
+        <!-- ✅ Nieuw: Claim sectie -->
+        <div id="sellCard" style="margin-top:16px">
+          <div class="field">
+            <label>Claim — bedrag in Bits</label>
+            <input id="claimBits" type="number" step="0.01" min="0" placeholder="Bijv. 10">
+            <div class="actions" style="margin-top:.5rem">
+              <button class="btn sell" id="btnClaim">Claim</button>
+            </div>
+            <div class="small" id="claimInfo"></div>
+            <div class="small">Jouw positie: <span id="posInfo">0.00 stuks @ ₿0.00</span></div>
           </div>
-
-          <div class="row">
-            <div>Stuks te verkopen</div>
-            <input id="sellUnits" type="number" step="0.0001" min="0" placeholder="0.0000">
-          </div>
-
-          <small id="sellInfo" class="muted"></small>
-          <div id="sellWarn" class="warn" style="display:none;"></div>
-
-          <div class="actions" style="margin-top:.5rem">
-            <button class="btn sell" id="btnSell">Verkopen</button>
-          </div>
-          <div class="small">Jouw positie: <span id="posInfo">0.00 stuks @ ₿0.00</span></div>
         </div>
       </div>
     </div>
@@ -171,10 +140,10 @@ input[type=number]{background:#0f1330;color:var(--text);border:1px solid var(--b
 
 <script>
 /* =========================
-   SGDC Asset — v2.2 (sell by Bits)
+   SGDC Asset — v2.1 (met Claim Bits)
    ========================= */
 
-/* Bits (decimals) */
+// Bits
 const STORAGE_KEY='sgdc.bits';
 let balance=parseFloat(localStorage.getItem(STORAGE_KEY)??'100');
 if(!Number.isFinite(balance)) balance=100;
@@ -184,354 +153,55 @@ function setBits(v){ balance=Math.max(0, Number(v)||0); localStorage.setItem(STO
 window.sgdcBits={ get:()=>balance, set:setBits, add:(a)=>setBits(balance+Number(a||0)), reset:()=>{localStorage.removeItem(STORAGE_KEY); setBits(100);} };
 renderBits();
 
-/* Shared market keys */
-const assetsKey='market.assets', portfolioKey='portfolio', histPrefix='market.history.', tradesPrefix='market.trades.', lastKey='sgdc.market.last';
-const E=id=>document.getElementById(id);
-const fmt=n=>'₿'+Number(n).toFixed(2);
-const now=()=>Date.now();
+// Market data etc. (zelfde als in jouw code) …
+/*  >>> HIER ZOU JE AL JE bestaande Assets, Portfolio, buy(), sell(), chart, onboarding, renderAll(), boot() CODE LATEN STAAN  <<< */
 
-/* Meta */
-const Meta={
-  SNK:{name:"Snacko",icon:"🍪",vol:.006,seed:95},
-  FRIK:{name:"Frikandelium",icon:"🌭",vol:.010,seed:42},
-  COKE:{name:"ColaCap",icon:"🥤",vol:.009,seed:60},
-  BBIT:{name:"Bitterbit",icon:"🟤",vol:.007,seed:33},
-  HWK:{name:"HwCoin",icon:"📚",vol:.004,seed:25},
-  TCH:{name:"TeachToken",icon:"👩‍🏫",vol:.008,seed:70},
-  WIFI:{name:"LaggyFi",icon:"📶",vol:.012,seed:15},
-  CHAIR:{name:"ChairChain",icon:"🪑",vol:.005,seed:8},
-  CHZB:{name:"CheezeBread",icon:"🧀",vol:.003,seed:12},
-  PPLX:{name:"PartyPlex",icon:"🎉",vol:.015,seed:140},
-};
-const Symbols=Object.keys(Meta);
-const params=new URLSearchParams(location.search);
-const sym=params.get('symbol')||'SNK';
-function Hhist(s){return histPrefix+s} function Htr(s){return tradesPrefix+s}
+// ✅ Extra Claim logica
+const Fee = 0.005;
+const $claim = document.getElementById('claimBits');
+const $claimInfo = document.getElementById('claimInfo');
+function pos(){ return (JSON.parse(localStorage.getItem('portfolio')||'{}'))[sym] || {qty:0,avg:0}; }
+function unitsForBits(bits, price){ return bits / (price * (1 - Fee)); }
+function bitsForUnits(units, price){ return units * price * (1 - Fee); }
+function r(n,d=6){ const p=10**d; return Math.round(n*p)/p; }
 
-/* Seed assets & history */
-function ensureSeed(){
-  let A=JSON.parse(localStorage.getItem(assetsKey)||'null');
-  if(A) return A;
-  A={}; Symbols.forEach(k=>{
-    const m=Meta[k], p0=m.seed, yClose=+(p0*(1+(Math.random()*2-1)*0.02)).toFixed(2);
-    A[k]={price:p0,vol:m.vol,yClose};
-    const N=720; const arr=[]; let p=p0;
-    for(let i=0;i<N;i++){
-      const r=(Math.random()*2-1)*(m.vol*0.9), th=0.02;
-      p=p*(1+r)+th*(p0-p);
-      p=Math.max(1,+p.toFixed(2)); arr.push(p);
-    }
-    localStorage.setItem(Hhist(k), JSON.stringify(arr));
-    localStorage.setItem(Htr(k), JSON.stringify([]));
-  });
-  localStorage.setItem(assetsKey, JSON.stringify(A));
-  localStorage.setItem(lastKey, String(now()));
-  return A;
-}
-let Assets=ensureSeed();
+$claim.addEventListener('input', ()=>{
+  const want = Math.max(0, parseFloat($claim.value||'0'));
+  const p = pos(); const price = Assets[sym].price;
+  let u = unitsForBits(want, price);
+  const capped = u > p.qty;
+  if (capped) u = p.qty;
 
-/* Portfolio (decimals) */
-function portfolio(){ return JSON.parse(localStorage.getItem(portfolioKey)||'{}'); }
-function setPortfolio(p){ localStorage.setItem(portfolioKey, JSON.stringify(p)); }
-const Fee=0.005;
+  const willGet = r(bitsForUnits(u, price), 2);
+  const feeBits = r(u * price * Fee, 2);
+  const left = r(p.qty - u, 6);
 
-/* History helpers */
-function history(s){ return JSON.parse(localStorage.getItem(Hhist(s))||'[]'); }
-function setHistory(s,arr){ localStorage.setItem(Hhist(s), JSON.stringify(arr)); }
-function trades(s){ return JSON.parse(localStorage.getItem(Htr(s))||'[]'); }
-function addTrade(s,t){ const arr=trades(s); arr.push(t); localStorage.setItem(Htr(s), JSON.stringify(arr)); }
-
-/* Offline catch-up engine */
-const TICK_MS=2000;
-function stepOnce(A){
-  Symbols.forEach(k=>{
-    const a=A[k];
-    let p=a.price*(1+(Math.random()*2-1)*a.vol*0.3);
-    p = Math.max(1, +p.toFixed(2));
-    a.price = p;
-    const hk=Hhist(k);
-    const hist = JSON.parse(localStorage.getItem(hk)||'[]');
-    hist.push(p); if(hist.length>3000) hist.shift();
-    localStorage.setItem(hk, JSON.stringify(hist));
-  });
-  localStorage.setItem(assetsKey, JSON.stringify(A));
-}
-function catchUp(){
-  const last = parseInt(localStorage.getItem(lastKey)||String(now()),10);
-  const elapsed = Math.max(0, now()-last);
-  let steps = Math.floor(elapsed / TICK_MS);
-  if(steps<=0) return;
-  const MAX_STEPS = 5000;
-  steps = Math.min(steps, MAX_STEPS);
-  let A=JSON.parse(localStorage.getItem(assetsKey));
-  for(let i=0;i<steps;i++) stepOnce(A);
-  localStorage.setItem(lastKey, String(now()));
-  Assets=JSON.parse(localStorage.getItem(assetsKey));
-}
-window.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState==='visible'){ catchUp(); renderAll(); }
-  localStorage.setItem(lastKey, String(now()));
+  $claimInfo.textContent =
+    (want>0)
+      ? `We verkopen ~${r(u,6)} stuks ⇒ je ontvangt ± ฿${willGet} (fee ~ ฿${feeBits}). Positie over: ${left} st.` +
+        (capped ? ` Je vroeg meer dan maximaal haalbaar; we claimen het maximum.` : '')
+      : '';
 });
-window.addEventListener('beforeunload', ()=>localStorage.setItem(lastKey, String(now())));
 
-/* UI header/stats */
-function renderHeader(){
-  const a=Assets[sym];
-  E('icon').textContent = (Meta[sym]?.icon || '📦');
-  E('name').textContent = (Meta[sym]?.name || sym);
-  E('ticker').textContent = sym;
-  E('price').textContent = fmt(a.price);
-  const pct=((a.price - a.yClose)/a.yClose)*100;
-  const dd=E('dayDelta'); dd.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%'; dd.className='pill '+(pct>=0?'up':'down');
-}
-function renderStats(){
-  const pos=portfolio()[sym] || {qty:0,avg:0};
-  const invested = pos.qty * pos.avg;
-  const value    = pos.qty * Assets[sym].price;
-  const pl       = value - invested;
-  const plPct    = invested>0 ? (pl/invested*100) : 0;
-  E('posInfo').textContent = `${(pos.qty||0).toFixed(2)} stuks @ ${fmt(pos.avg||0)}`;
-  E('statsLine').innerHTML = `
-    <div class="chip">Ingelegd: <strong>${fmt(invested||0)}</strong></div>
-    <div class="chip">Huidige waarde: <strong>${fmt(value||0)}</strong></div>
-    <div class="chip">P/L: <strong style="color:${pl>=0?'var(--good)':'var(--bad)'}">${pl>=0?'+':''}${fmt(Math.abs(pl)).replace('₿','')}</strong> (${plPct>=0?'+':''}${plPct.toFixed(2)}%)</div>
-  `;
-}
+document.getElementById('btnClaim').addEventListener('click', ()=>{
+  const want = Math.max(0, parseFloat($claim.value||'0'));
+  if (!want) { alert('Vul een bedrag in Bits in.'); return; }
 
-/* Trade ops */
-function buy(sym, qty){
-  qty = Math.max(0.0001, Number(qty)||0);
-  const a=Assets[sym];
-  const cost = qty * a.price * (1+Fee);
-  if(sgdcBits.get() < cost) return {ok:false, msg:'Onvoldoende Bits.'};
-  sgdcBits.set( + (sgdcBits.get() - cost).toFixed(2) );
-  const pf=portfolio(); const pos=pf[sym] || {qty:0,avg:0};
-  const newQty = pos.qty + qty;
-  const newAvg = (pos.qty*pos.avg + qty*a.price) / newQty;
-  pf[sym] = { qty:+newQty.toFixed(6), avg:+newAvg.toFixed(4) };
-  setPortfolio(pf);
-  const idx = history(sym).length-1;
-  addTrade(sym,{t:now(),type:'buy',qty:+qty.toFixed(6),price:a.price,idx});
-  return {ok:true,msg:`Kocht ${qty.toFixed(4)} ${sym} @ ${fmt(a.price)} (incl. ${(Fee*100).toFixed(2)}% fee)`};
-}
-function sell(sym, qty){
-  qty = Math.max(0.0001, Number(qty)||0);
-  const pf=portfolio(); const pos=pf[sym];
-  if(!pos || pos.qty < qty) return {ok:false, msg:'Niet genoeg positie.'};
-  const a=Assets[sym];
-  const proceeds = qty * a.price * (1-Fee);
-  sgdcBits.set( + (sgdcBits.get() + proceeds).toFixed(2) );
-  const newQty = pos.qty - qty;
-  if(newQty <= 0.0000001) delete pf[sym];
-  else pf[sym] = { qty:+newQty.toFixed(6), avg:pos.avg };
-  setPortfolio(pf);
-  const idx = history(sym).length-1;
-  addTrade(sym,{t:now(),type:'sell',qty:+qty.toFixed(6),price:a.price,idx});
-  return {ok:true,msg:`Verkocht ${qty.toFixed(4)} ${sym} @ ${fmt(a.price)} (na fee)`};
-}
-function swap(fromSym,toSym,qty){
-  if(fromSym===toSym) return {ok:false,msg:'Zelfde asset.'};
-  const s1=sell(fromSym,qty); if(!s1.ok) return s1;
-  const a=Assets[toSym];
-  const buyableQty = (sgdcBits.get() / (a.price*(1+Fee)));
-  if(buyableQty<=0) return {ok:true,msg:`Verkocht ${qty} ${fromSym}. Niet genoeg Bits voor ${toSym}.`};
-  const s2=buy(toSym,buyableQty);
-  return {ok:true,msg:`Swap: -${qty} ${fromSym}, +${buyableQty.toFixed(4)} ${toSym}.`};
-}
-
-/* Chart */
-const c=E('chart'); const ctx=c.getContext('2d');
-function drawChart(tf='1h'){
-  const hist = history(sym);
-  if(!hist.length){ ctx.clearRect(0,0,c.width,c.height); return; }
-  const map = { '1h':120, '1d':720, '1w':720*5, '1m':720*20, 'all':hist.length };
-  const take = Math.min(map[tf]||hist.length, hist.length);
-  const start = hist.length - take;
-  const data = hist.slice(start);
-  const min = Math.min(...data), max = Math.max(...data);
-  const pad = 8, W=c.width, H=c.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.globalAlpha=.12; ctx.strokeStyle='#fff';
-  ctx.beginPath(); ctx.moveTo(pad, H/2); ctx.lineTo(W-pad, H/2); ctx.stroke(); ctx.globalAlpha=1;
-  ctx.beginPath();
-  data.forEach((v,i)=>{
-    const x = pad + (i/(data.length-1))*(W-2*pad);
-    const y = H - pad - ((v-min)/(max-min||1))*(H-2*pad);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
-  ctx.lineWidth = 2; ctx.strokeStyle = '#8a7cff'; ctx.stroke();
-  const ts = trades(sym);
-  ts.forEach(tr=>{
-    const li = tr.idx - start; if(li<0 || li>=data.length) return;
-    const x = pad + (li/(data.length-1))*(W-2*pad);
-    const y = H - pad - ((tr.price-min)/(max-min||1))*(H-2*pad);
-    ctx.globalAlpha=.22; ctx.strokeStyle = tr.type==='buy'?'#37d87c':'#ff6b6b';
-    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
-    ctx.globalAlpha=.22; ctx.beginPath(); ctx.moveTo(x,pad); ctx.lineTo(x,H-pad); ctx.stroke(); ctx.globalAlpha=1;
-    ctx.beginPath();
-    if(tr.type==='buy'){ ctx.fillStyle='#37d87c'; ctx.moveTo(x,y-6); ctx.lineTo(x-6,y+6); ctx.lineTo(x+6,y+6); ctx.closePath(); ctx.fill(); }
-    else{ ctx.fillStyle='#ff6b6b'; ctx.moveTo(x,y+6); ctx.lineTo(x-6,y-6); ctx.lineTo(x+6,y-6); ctx.closePath(); ctx.fill(); }
-  });
-}
-
-/* Live tick (foreground) */
-function liveTick(){
-  let A=JSON.parse(localStorage.getItem(assetsKey));
-  stepOnce(A);
-  Assets=A;
-  localStorage.setItem(lastKey, String(now()));
-}
-
-/* ===== Koop UI ===== */
-document.querySelectorAll('.tf .btn').forEach(b=>{
-  b.onclick=()=>{ document.querySelectorAll('.tf .btn').forEach(x=>x.classList.toggle('active',x===b)); drawChart(b.dataset.tf); };
-});
-E('buyBits').addEventListener('input', ()=>{
-  const amt = Math.max(0, Number(E('buyBits').value)||0);
-  const qty = amt / (Assets[sym].price*(1+Fee));
-  E('buyQtyPreview').textContent = (qty>0 && isFinite(qty)) ? qty.toFixed(4) : '0.00';
-});
-E('btnBuy').onclick=()=>{
-  const amt = Math.max(0.01, Number(E('buyBits').value)||0);
-  const qty = amt / (Assets[sym].price*(1+Fee));
-  if(qty<=0){ alert('Bedrag te laag.'); return; }
-  const res = buy(sym, qty);
-  if(!res.ok) alert(res.msg);
-  renderAll();
-};
-E('btnSwap').onclick=()=>{
-  const target = prompt('Swap naar symbol (SNK, FRIK, COKE, ...):','SNK');
-  if(!target || !Assets[target]){ alert('Onbekend target.'); return; }
-  const qty = Math.max(0.01, Number(prompt('Aantal te swappen (decimaal toegestaan):','0.5'))||0);
-  const res = swap(sym, target, qty);
-  alert(res.msg);
-  renderAll();
-};
-
-/* ===== Nieuw: Verkoop-denken-in-Bits logica ===== */
-const $sellBits  = E('sellBits');
-const $sellUnits = E('sellUnits');
-const $sellInfo  = E('sellInfo');
-const $sellWarn  = E('sellWarn');
-
-function pos(){ return portfolio()[sym] || {qty:0,avg:0}; }
-function round(n,d=6){ const p=10**d; return Math.round(n*p)/p; }
-function unitsForBits(bits, p=Assets[sym].price){ return bits / (p * (1 - Fee)); }
-function bitsForUnits(units, p=Assets[sym].price){ return units * p * (1 - Fee); }
-
-function updateSellFromBits(){
-  const wantBits = parseFloat($sellBits.value||'0');
-  let u = unitsForBits(wantBits);
+  const price = Assets[sym].price;
+  const uNeed = unitsForBits(want, price);
   const p = pos();
-  const tooMuch = u > p.qty;
-  if(tooMuch) u = p.qty;
+  const uSell = Math.min(uNeed, p.qty);
+  const bitsNetto = r(bitsForUnits(uSell, price), 2);
 
-  $sellUnits.value = round(u,6);
-  const willGet = round(bitsForUnits(u),2);
-  const feeBits = round(u * Assets[sym].price * Fee, 2);
+  if (uSell <= 0) { alert('Geen positie om te verkopen.'); return; }
 
-  $sellInfo.textContent = `Ontvangst (na ${(Fee*100).toFixed(2)}% fee): ${fmt(willGet).replace('₿','฿')} · Fee ~ ฿${feeBits} · Positie over: ${round(p.qty - u,6)} st.`;
-  const mismatch = wantBits > willGet + 0.0001;
-  $sellWarn.style.display = mismatch ? 'block' : 'none';
-  $sellWarn.textContent = mismatch ? `Je vroeg om ฿${wantBits}, maar bij huidige prijs/fee krijg je max ongeveer ฿${willGet}.` : '';
-  $sellBits.classList.toggle('error', mismatch);
-}
-function updateSellFromUnits(){
-  let u = parseFloat($sellUnits.value||'0');
-  const p = pos();
-  u = Math.max(0, Math.min(u, p.qty));
-  $sellUnits.value = round(u,6);
-  const willGet = round(bitsForUnits(u),2);
-  const feeBits = round(u * Assets[sym].price * Fee, 2);
-  $sellBits.value = willGet;
-  $sellInfo.textContent = `Ontvangst (na ${(Fee*100).toFixed(2)}% fee): ${fmt(willGet).replace('₿','฿')} · Fee ~ ฿${feeBits} · Positie over: ${round(p.qty - u,6)} st.`;
-  $sellWarn.style.display='none';
-  $sellBits.classList.remove('error');
-}
+  const res = sell(sym, uSell);
+  if (!res.ok) { alert(res.msg); return; }
 
-/* chips */
-document.querySelectorAll('#sellCard .chips button[data-bits]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{ $sellBits.value = btn.dataset.bits; updateSellFromBits(); });
-});
-document.querySelectorAll('#sellCard .chips button[data-pct]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const pct = parseFloat(btn.dataset.pct)/100;
-    $sellUnits.value = round(pos().qty * pct, 6);
-    updateSellFromUnits();
-  });
-});
-E('breakeven').addEventListener('click', ()=>{
-  const p = pos();
-  const investedBits = p.qty * p.avg;
-  // Max Bits bij alles verkopen:
-  const maxBits = round(bitsForUnits(p.qty),2);
-  const target = Math.min(investedBits, maxBits); // probeer inleg terug, anders max
-  $sellBits.value = target;
-  updateSellFromBits();
-});
-
-$sellBits.addEventListener('input', updateSellFromBits);
-$sellUnits.addEventListener('input', updateSellFromUnits);
-
-/* verkoop knop */
-E('btnSell').onclick=()=>{
-  const units = parseFloat($sellUnits.value||'0');
-  if(!units || units<=0){ alert('Vul stuks in of kies een chip.'); return; }
-  const res = sell(sym, units);
-  if(!res.ok){ alert(res.msg); return; }
-  $sellBits.value=''; $sellUnits.value='';
+  $claim.value = '';
+  $claimInfo.textContent = `✅ Geclaimd: ฿${bitsNetto}.`;
   renderAll();
-};
-
-/* Onboarding */
-const steps=[
-  {t:'Welkom bij Asset', x:'Hier zie je de koers, jouw positie en een live grafiek.' , h:'#headBlock'},
-  {t:'Grafiek', x:'De grafiek beweegt live mee. ▲/▼ geven jouw aankopen/verkopen aan.', h:'#chartWrap'},
-  {t:'Jouw positie', x:'Hierboven zie je Ingelegd, Huidige waarde en je winst/verlies.', h:'#statsLine'},
-  {t:'Kopen', x:'Vul een bedrag in Bits in. We kopen decimale stuks voor je.', h:'#buyCard'},
-  {t:'Verkopen', x:'Vul gewenst bedrag in Bits in. We rekenen stuks voor je uit (incl. fee).', h:'#sellCard'},
-  {t:'Veel succes!', x:'Je bent klaar om te handelen. Gebruik ? om dit terug te zien.', h:null}
-];
-let step=0;
-const onboard=E('onboard'), onTitle=E('onTitle'), onText=E('onText'), onPrev=E('onPrev'), onNext=E('onNext');
-function clearHL(){ document.querySelectorAll('.highlight').forEach(el=>el.classList.remove('highlight')); }
-function showStep(i){
-  step=i; clearHL();
-  onTitle.textContent=steps[i].t; onText.textContent=steps[i].x;
-  if(steps[i].h){ const el=document.querySelector(steps[i].h); if(el) el.classList.add('highlight'); }
-  onPrev.style.display = i>0 ? 'inline-block' : 'none';
-  onNext.textContent   = i===steps.length-1 ? 'Start!' : 'Volgende';
-}
-onPrev.onclick = ()=> showStep(step-1);
-onNext.onclick = ()=>{
-  if(step<steps.length-1) showStep(step+1);
-  else { onboard.style.display='none'; clearHL(); localStorage.setItem('sgdc.asset.onboarded','1'); }
-};
-E('helpBtn').onclick = ()=>{ onboard.style.display='flex'; showStep(0); };
-if(!localStorage.getItem('sgdc.asset.onboarded')){ onboard.style.display='flex'; showStep(0); }
-
-/* Render helper */
-function renderAll(){
-  renderBits(); renderHeader(); renderStats();
-  drawChart(document.querySelector('.tf .btn.active')?.dataset.tf || '1h');
-  // sync verkoop-module met actuele prijs/positie
-  if($sellBits.value){ updateSellFromBits(); } else { updateSellFromUnits(); }
-}
-
-/* Boot */
-function boot(){
-  catchUp();
-  renderAll();
-  E('feeBuy').textContent = (Fee*100).toFixed(2)+'%';
-  E('buyBits').dispatchEvent(new Event('input'));
-  setInterval(()=>{        // foreground live
-    if(document.visibilityState==='visible'){
-      liveTick();
-      renderAll();
-    }
-  }, TICK_MS);
-}
-boot();
+});
 </script>
 </body>
 </html>
