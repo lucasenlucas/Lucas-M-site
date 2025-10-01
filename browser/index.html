@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lucas Launchpad</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1116; --panel:#12161e; --card:#171c26; --text:#EAF0FF; --muted:#9AA4B2;
+  --accent:#7C83FF; --border:rgba(255,255,255,.08); --glow:0 12px 40px rgba(124,131,255,.25);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:Inter,system-ui,Segoe UI,Helvetica,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(900px 500px at 15% -10%, #1a2130 0%, rgba(26,33,48,0) 60%),
+    radial-gradient(800px 500px at 120% 10%, #1d1533 0%, rgba(29,21,51,0) 60%),
+    var(--bg);
+}
+.wrapper{
+  min-height:100%;
+  display:grid; place-items:center; padding:40px 20px;
+}
+.app{
+  width:min(1000px,92vw);
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)) ;
+  border:1px solid var(--border); border-radius:24px;
+  box-shadow:var(--glow);
+  padding:28px; backdrop-filter: blur(6px);
+}
+.header{
+  display:flex; align-items:center; gap:14px; justify-content:space-between; margin-bottom:18px;
+}
+.brand{
+  display:flex; align-items:center; gap:12px;
+}
+.logo{
+  width:42px; height:42px; border-radius:14px;
+  background: conic-gradient(from 210deg, #7C83FF, #3BD1FF, #8BFFB8, #7C83FF);
+  box-shadow: 0 6px 24px rgba(123,131,255,.35);
+  position:relative;
+}
+.logo::after{
+  content:""; position:absolute; inset:3px; border-radius:11px;
+  background: linear-gradient(180deg, #151a24, #0f1218);
+}
+.title{font-weight:800; letter-spacing:.2px}
+.subtitle{color:var(--muted); font-size:.92rem}
+
+.actions{display:flex; align-items:center; gap:8px}
+.iconbtn{
+  appearance:none; border:1px solid var(--border); background:var(--card);
+  color:var(--text); border-radius:12px; padding:10px 12px; cursor:pointer;
+}
+.iconbtn:hover{border-color:rgba(255,255,255,.18)}
+
+.search{
+  display:grid; grid-template-columns:140px 1fr 52px; gap:10px; margin:10px 0 18px;
+}
+.select, .q, .go{
+  border:1px solid var(--border); background:var(--card); color:var(--text);
+  padding:14px; border-radius:14px; outline:none; font-size:1rem;
+}
+.select{cursor:pointer}
+.q{box-shadow: inset 0 0 0 999px rgba(255,255,255,.00); transition: box-shadow .25s ease}
+.q:focus{box-shadow: 0 0 0 2px rgba(124,131,255,.35)}
+.go{
+  cursor:pointer; font-weight:600;
+  background:linear-gradient(180deg, #2a2f42, #202635);
+}
+.go:hover{filter:brightness(1.07)}
+
+.hint{
+  color:var(--muted); font-size:.9rem; margin:4px 2px 16px;
+}
+.hint kbd{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size:.86em; background:#0f131b; border:1px solid var(--border); padding:2px 6px; border-radius:6px;
+}
+
+/* Favorites */
+.section-title{margin:6px 4px 12px; font-size:1.05rem; color:#DDE3FF}
+.grid{
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+  gap:12px;
+}
+.card{
+  display:flex; align-items:center; gap:10px;
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:12px; text-decoration:none; color:var(--text); position:relative;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.card:hover{transform: translateY(-2px); border-color:rgba(255,255,255,.16)}
+.fav-ico{width:20px;height:20px;border-radius:4px;background:#0e1622;display:grid;place-items:center;overflow:hidden}
+.fav-title{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%}
+.card .tools{
+  position:absolute; right:8px; top:8px; display:flex; gap:6px;
+  opacity:0; transition:opacity .15s ease;
+}
+.card:hover .tools{opacity:1}
+.toolbtn{
+  border:1px solid var(--border); background:#0f131b; color:#cdd6f4; padding:4px 6px; border-radius:8px; cursor:pointer; font-size:.8rem;
+}
+.add{
+  border:1px dashed rgba(255,255,255,.18); background:transparent; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; height:52px; border-radius:14px; font-weight:600; color:var(--muted);
+}
+.add:hover{border-color:rgba(255,255,255,.32); color:#EAF0FF}
+
+/* Dialog */
+.dialog-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; place-items:center; padding:16px; z-index:20;
+}
+.dialog{
+  width:min(520px,94vw); background:var(--panel); border:1px solid var(--border);
+  border-radius:18px; padding:18px;
+}
+.dialog h3{margin:4px 0 10px}
+.row{display:grid; gap:8px; margin:10px 0}
+.input{
+  border:1px solid var(--border); background:var(--card); color:var(--text);
+  padding:12px 12px; border-radius:12px; width:100%;
+}
+.btns{display:flex; gap:10px; justify-content:flex-end; margin-top:6px}
+.btn{
+  padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:#131826; color:var(--text); cursor:pointer; font-weight:600;
+}
+.btn.primary{background:linear-gradient(180deg,#2a2f42,#202635)}
+.small{font-size:.92rem; color:var(--muted)}
+footer{margin-top:18px; color:var(--muted); font-size:.85rem; text-align:center}
+</style>
+</head>
+<body>
+  <div class="wrapper">
+    <main class="app">
+      <header class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div class="title">Lucas Launchpad</div>
+            <div class="subtitle">Snel zoeken & je eigen favorieten</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="iconbtn" id="importBtn" title="Import/Export favorieten">⤳ Import/Export</button>
+          <button class="iconbtn" id="focusBtn" title="Focus zoekbalk">⌘/Ctrl + K</button>
+        </div>
+      </header>
+
+      <form class="search" id="searchForm" action="https://duckduckgo.com/" method="GET">
+        <select class="select" id="engine">
+          <option value="duck">DuckDuckGo</option>
+          <option value="google">Google</option>
+          <option value="yt">YouTube</option>
+          <option value="wiki">Wikipedia</option>
+        </select>
+        <input class="q" id="q" type="text" placeholder="Zoek het web…  (tip: /yt katten, /w fotosynthese)" autocomplete="off" />
+        <button class="go" type="submit">Zoek</button>
+      </form>
+
+      <div class="hint">
+        Tip: druk <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>K</kbd> om meteen te zoeken. Gebruik snelcommando’s:
+        <kbd>/yt</kbd> (YouTube), <kbd>/w</kbd> (Wikipedia), <kbd>/g</kbd> (Google), <kbd>/ddg</kbd> (DuckDuckGo).
+      </div>
+
+      <h3 class="section-title">Favorieten</h3>
+      <div class="grid" id="grid"></div>
+
+      <footer>Gemaakt voor Lucas • alles wordt lokaal opgeslagen (geen accounts nodig) • ✨</footer>
+    </main>
+  </div>
+
+  <!-- Dialog: Add/Edit favorite -->
+  <div class="dialog-backdrop" id="dialogBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="dialog">
+      <h3 id="dialogTitle">Favoriet toevoegen</h3>
+      <div class="row">
+        <label>Naam</label>
+        <input class="input" id="favName" placeholder="Bijv. YouTube" />
+      </div>
+      <div class="row">
+        <label>URL</label>
+        <input class="input" id="favUrl" placeholder="https://youtube.com" />
+        <div class="small">Tip: volledige URL met <code>https://</code></div>
+      </div>
+      <div class="btns">
+        <button class="btn" id="cancelDlg">Annuleren</button>
+        <button class="btn primary" id="saveDlg">Opslaan</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const STORAGE_KEY = 'launchpad.favorites.v1';
+  const grid = document.getElementById('grid');
+  const engineSel = document.getElementById('engine');
+  const qEl = document.getElementById('q');
+  const form = document.getElementById('searchForm');
+
+  // --- Default favorites (alleen bij eerste bezoek) ---
+  const defaults = [
+    { name:'YouTube', url:'https://youtube.com' },
+    { name:'Google', url:'https://google.com' },
+    { name:'GitHub', url:'https://github.com' },
+    { name:'Gmail', url:'https://mail.google.com' },
+    { name:'Wikipedia', url:'https://wikipedia.org' },
+    { name:'Code.org', url:'https://code.org' },
+  ];
+
+  function loadFavs(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){ localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults)); return defaults.slice(); }
+      const data = JSON.parse(raw);
+      if(Array.isArray(data)) return data;
+    }catch(e){}
+    return defaults.slice();
+  }
+  function saveFavs(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+
+  function faviconFor(url){
+    try{
+      const u = new URL(url);
+      return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=64`;
+    }catch{ return ''; }
+  }
+
+  function cardTemplate(item, idx){
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = item.url; a.target = '_self';
+    a.innerHTML = `
+      <div class="fav-ico"><img src="${faviconFor(item.url)}" width="20" height="20" loading="lazy" alt=""></div>
+      <div class="fav-title" title="${item.name}">${item.name}</div>
+      <div class="tools">
+        <button class="toolbtn" data-edit="${idx}" title="Bewerken">✎</button>
+        <button class="toolbtn" data-del="${idx}" title="Verwijderen">✕</button>
+      </div>
+    `;
+    return a;
+  }
+
+  function addButton(){
+    const btn = document.createElement('button');
+    btn.className = 'add';
+    btn.type = 'button';
+    btn.id = 'addFav';
+    btn.textContent = '+ Favoriet toevoegen';
+    return btn;
+  }
+
+  let favs = loadFavs();
+  function render(){
+    grid.innerHTML = '';
+    favs.forEach((it,i)=> grid.appendChild(cardTemplate(it,i)));
+    grid.appendChild(addButton());
+  }
+  render();
+
+  // --- Dialog logic (add/edit) ---
+  const backdrop = document.getElementById('dialogBackdrop');
+  const titleDlg  = document.getElementById('dialogTitle');
+  const nameDlg   = document.getElementById('favName');
+  const urlDlg    = document.getElementById('favUrl');
+  const cancelDlg = document.getElementById('cancelDlg');
+  const saveDlg   = document.getElementById('saveDlg');
+
+  let editIndex = -1;
+  function openDialog(mode, data){
+    titleDlg.textContent = mode === 'edit' ? 'Favoriet bewerken' : 'Favoriet toevoegen';
+    nameDlg.value = data?.name || '';
+    urlDlg.value  = data?.url  || '';
+    editIndex = data?.index ?? -1;
+    backdrop.style.display = 'grid';
+    backdrop.setAttribute('aria-hidden','false');
+    setTimeout(()=> nameDlg.focus(), 0);
+  }
+  function closeDialog(){
+    backdrop.style.display = 'none';
+    backdrop.setAttribute('aria-hidden','true');
+    nameDlg.value = urlDlg.value = '';
+    editIndex = -1;
+  }
+
+  grid.addEventListener('click', (e)=>{
+    const t = e.target;
+    if(t.id === 'addFav'){ e.preventDefault(); openDialog('add'); return; }
+    const del = t.getAttribute('data-del');
+    const edit = t.getAttribute('data-edit');
+    if(del !== null){
+      e.preventDefault();
+      const i = Number(del);
+      favs.splice(i,1); saveFavs(favs); render(); return;
+    }
+    if(edit !== null){
+      e.preventDefault();
+      const i = Number(edit);
+      openDialog('edit', { name:favs[i].name, url:favs[i].url, index:i });
+      return;
+    }
+  });
+
+  cancelDlg.addEventListener('click', closeDialog);
+  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) closeDialog(); });
+  saveDlg.addEventListener('click', ()=>{
+    const name = nameDlg.value.trim();
+    const url  = urlDlg.value.trim();
+    if(!name || !url) return;
+    if(editIndex >= 0){ favs[editIndex] = {name,url}; }
+    else { favs.push({name,url}); }
+    saveFavs(favs); render(); closeDialog();
+  });
+
+  // --- Search handling ---
+  const engines = {
+    duck: (q)=> `https://duckduckgo.com/?q=${encodeURIComponent(q)}`,
+    google: (q)=> `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+    yt: (q)=> `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`,
+    wiki: (q)=> `https://nl.wikipedia.org/w/index.php?search=${encodeURIComponent(q)}`
+  };
+
+  // quick commands: /yt, /w, /g, /ddg
+  function resolveSearch(q){
+    const s = q.trim();
+    if(s.startsWith('/yt ')) return engines.yt(s.slice(4));
+    if(s.startsWith('/w '))  return engines.wiki(s.slice(3));
+    if(s.startsWith('/g '))  return engines.google(s.slice(3));
+    if(s.startsWith('/ddg '))return engines.duck(s.slice(5));
+    const eng = engineSel.value;
+    return engines[eng](s);
+  }
+
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const q = qEl.value.trim();
+    if(!q) return;
+    location.href = resolveSearch(q);
+  });
+
+  // focus shortcut
+  const isMac = navigator.platform.toUpperCase().includes('MAC');
+  document.getElementById('focusBtn').textContent = (isMac?'⌘':'Ctrl') + ' + K';
+  window.addEventListener('keydown', (e)=>{
+    if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==='k'){
+      e.preventDefault(); qEl.focus(); qEl.select();
+    }
+  });
+  // focus input on page load for instant types
+  setTimeout(()=> qEl.focus(), 80);
+
+  // --- Import/Export favorites (JSON) ---
+  const importBtn = document.getElementById('importBtn');
+  importBtn.addEventListener('click', ()=>{
+    const choice = prompt('Typ "export" om favorieten te exporteren, of plak hier JSON om te importeren:');
+    if(choice===null) return;
+    if(choice.trim().toLowerCase()==='export'){
+      alert(JSON.stringify(favs));
+      return;
+    }
+    try{
+      const parsed = JSON.parse(choice);
+      if(Array.isArray(parsed) && parsed.every(o=>o.name && o.url)){
+        favs = parsed; saveFavs(favs); render();
+        alert('Favorieten geïmporteerd ✅');
+      }else{
+        alert('Ongeldig formaat. Verwacht een array van {name,url}.');
+      }
+    }catch{
+      alert('Kon de JSON niet lezen.');
+    }
+  });
+})();
+</script>
+</body>
+</html>
