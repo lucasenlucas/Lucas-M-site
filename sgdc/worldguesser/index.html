@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SGDC Games · WorldGuessr</title>
+  <meta name="theme-color" content="#0b1220" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --accent:#50C878;
+      --text:#e6eef9;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Roboto,sans-serif;overflow:hidden}
+
+    header{
+      position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;gap:12px;
+      padding:0 16px;background:rgba(10,15,25,0.9);backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.1);z-index:10;
+    }
+    .btn{
+      background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text);
+      padding:8px 14px;border-radius:12px;cursor:pointer;transition:all .2s ease;
+    }
+    .btn:hover{background:rgba(255,255,255,.1)}
+    .title{font-weight:600;font-size:1.1rem;}
+
+    iframe{
+      position:absolute;top:56px;left:0;width:100%;height:calc(100% - 56px);
+      border:0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="btn" onclick="window.location.href='/sgdc-games/live'">⬅️ Terug</button>
+    <div class="title">SGDC Games · WorldGuessr</div>
+  </header>
+
+  <iframe src="https://www.worldguessr.com/?crazygames=&skipPrerollFirstSession=true" allow="fullscreen; autoplay" allowfullscreen></iframe>
+</body>
+</html>
