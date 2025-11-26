@@ -1,385 +1,79 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SGDC games — Home</title>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- Favicon -->
-  <link rel="icon" href="https://groep8sgdc.nl/wp-content/uploads/2022/09/s-Gravendreef-scholen07-01-18-1.png" />
-
+  <meta charset="UTF-8" />
+  <title>sgdc live...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root{
-      --bg:#0e1023; --panel:#171a37; --text:#e8ecff; --muted:#a2a9d6;
-      --brand:#8a7cff; --accent:#f4b73b; --good:#4bd37b; --shadow:0 10px 30px rgba(0,0,0,.35);
-      --border:rgba(255,255,255,.10);
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: sans-serif;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
 
-    /* Topbar */
-    .nav-wrap{position:sticky;top:0;z-index:50;background:rgba(16,18,41,.75);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08)}
-    .nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 16px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
-    .brand .logo{width:38px;height:38px;border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
-    .brand .logo img{display:block;width:100%;height:100%;object-fit:contain;background:transparent}
-    .spacer{flex:1}
-    .balance{font-weight:800;color:var(--good);white-space:nowrap;display:flex;align-items:center;gap:10px}
-    .streak-badge{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:3px 10px;border-radius:999px;font-size:.85rem;font-weight:800;
-      background:rgba(255,183,59,.12);border:1px solid rgba(255,183,59,.35);color:#ffd27a;
+    iframe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
     }
-    .streak-badge .flame{animation:flame 1.6s ease-in-out infinite;display:inline-block}
-    @keyframes flame{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.05)}}
 
-    .container{max-width:1200px;margin:0 auto;padding:20px 16px 56px}
-
-    /* Game buttons grid */
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px;margin-top:18px}
-    .game-btn{
-      display:block; text-decoration:none; color:var(--text); border-radius:20px; overflow:hidden;
-      min-height:220px; background:var(--panel); box-shadow:var(--shadow); border:1px solid var(--border);
-      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-      cursor:pointer;
+    .fallback {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.2rem;
+      display: none;
     }
-    .game-btn:hover, .game-btn:focus-visible{
-      transform:translateY(-3px); outline:none; border-color:rgba(255,255,255,.20);
-      box-shadow:0 16px 36px rgba(0,0,0,.45)
-    }
-    .g-thumb{aspect-ratio:16/10;display:grid;place-items:center;font-weight:800;font-size:1.2rem}
-    .g-body{padding:16px;display:flex;align-items:center;justify-content:space-between}
-    .pill{background:rgba(255,255,255,.10);padding:6px 10px;border-radius:999px;font-size:.78rem;color:var(--muted)}
-    .soon .pill{background:rgba(255,255,255,.06);color:#c9c9ff}
-    .soon{opacity:.6;pointer-events:none}
-
-    /* Footer hint */
-    .hint{color:var(--muted); margin-top:16px; font-size:.92rem}
-
-    /* Coins ticker badge ( +X Coins popup ) */
-    .bits-ticker{display:inline-flex;align-items:center;gap:8px}
-    .bits-anim{
-      font-weight:800; padding:2px 8px; border-radius:999px; font-size:.85rem;
-      background:rgba(80,232,194,.14); border:1px solid rgba(80,232,194,.35);
-      transform:translateY(0); opacity:0; transition:opacity .25s ease, transform .25s ease;
-    }
-    .bits-anim.show{opacity:1; transform:translateY(-3px)}
-
-    /* --- Streak Modal Styles --- */
-    #streakModal{position:fixed;inset:0;display:none;z-index:80}
-    #streakModal.show{display:block}
-    .streak-backdrop{position:absolute;inset:0;background:rgba(10,12,28,.6);backdrop-filter:blur(6px)}
-    .streak-card{
-      position:relative; z-index:1; width:min(520px,92vw); margin:8vh auto 0; border-radius:24px;
-      background:linear-gradient(180deg, rgba(138,124,255,.25), rgba(20,23,54,.9));
-      border:1px solid rgba(255,255,255,.12); box-shadow:0 30px 60px rgba(0,0,0,.45);
-      padding:28px 24px 24px; text-align:center; color:#e8ecff; overflow:hidden;
-      animation:popIn .45s cubic-bezier(.2,.8,.2,1)
-    }
-    .streak-badge-card{
-      width:92px;height:92px;border-radius:50%;margin:-66px auto 8px;display:grid;place-items:center;
-      background:radial-gradient(45px 45px at 50% 45%, #ffb703, transparent 60%),
-                 radial-gradient(70px 70px at 50% 55%, rgba(255,183,59,.25), transparent 70%);
-      box-shadow:0 12px 30px rgba(0,0,0,.35), inset 0 0 40px rgba(255,183,59,.35);
-      transform:translateY(34px)
-    }
-    #streakFlame{font-size:40px;animation:flame 1.6s ease-in-out infinite}
-    .streak-sub{color:#a2a9d6;margin:.25rem 0 1rem}
-    .streak-reward{margin:14px 0 18px}
-    .reward-amount{font-weight:800; font-size:2.4rem; letter-spacing:.5px; text-shadow:0 6px 24px rgba(0,0,0,.35)}
-    .reward-note{color:#cfd3ff;font-size:.9rem;opacity:.9;margin:.35rem 0 0}
-    .streak-btn{
-      appearance:none;border:0;border-radius:999px;padding:12px 18px;font-weight:800;cursor:pointer;
-      background:linear-gradient(90deg,#8a7cff,#50e3c2); color:#0e1023; box-shadow:0 10px 24px rgba(0,0,0,.35);
-      transition:transform .15s ease, box-shadow .15s ease
-    }
-    .streak-btn:hover{transform:translateY(-1px);box-shadow:0 16px 30px rgba(0,0,0,.45)}
-    #confettiCanvas{position:absolute;inset:0;pointer-events:none}
-    @keyframes popIn{0%{transform:translateY(10px) scale(.96);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
   </style>
 </head>
 <body>
-  <!-- Bits (onderliggende store) -->
-  <script src="js/bits.js"></script>
 
-  <!-- Topbar -->
-  <div class="nav-wrap">
-    <nav class="nav">
-      <div class="brand">
-        <div class="logo">
-          <img src="https://groep8sgdc.nl/wp-content/uploads/2022/09/s-Gravendreef-scholen07-01-18-1.png" alt="SGDC Logo" />
-        </div>
-        <div>SGDC Games</div>
-      </div>
-      <div class="spacer"></div>
-      <div class="balance">
-        Coins: <span id="bitsValue">0</span>
-        <span id="bitsDelta" class="bits-anim" aria-hidden="true"></span>
-        <!-- 🔥 Streak badge in header -->
-        <span id="headerStreak" class="streak-badge" title="Dagelijkse streak">
-          <span class="flame">🔥</span><span id="headerStreakVal">x0</span>
-        </span>
-      </div>
-    </nav>
-  </div>
+  <iframe
+    src="https://sgdclive.lovable.app"
+    id="embedFrame"
+  ></iframe>
 
-  <!-- Content -->
-  <main class="container">
-    <h1 style="margin:0 0 6px">SGDC Games</h1>
-    <p class="hint">BELANGRIJKE UPDATE: vanaf nu SGDC Games alleen losse games, niets is gekoppeld en er zijn geen gokspellen meer. Sorry!</p>
-
-    <section class="grid" aria-label="Games">
-      <a class="game-btn" href="snake/" role="button" aria-label="Speel Snake">
-        <div class="g-thumb" style="background:linear-gradient(160deg,#50e3c2,#8a7cff)">Snake</div>
-        <div class="g-body"><strong>Snake</strong><span class="pill">Nu spelen</span></div>
-      </a>
-
-      <a class="game-btn" href="mines-off/" role="button" aria-label="Speel Mines">
-        <div class="g-thumb" style="background:linear-gradient(160deg,#ffe36d,#ff9f4d)">Mines</div>
-        <div class="g-body"><strong>Mines --tijdelijk offline</strong><span class="pill">Tijdelijk Offline</span></div>
-      </a>
-
-      <!-- Minecraft -->
-      <a class="game-btn" href="Minecraft/index.html" role="button" aria-label="Speel Minecraft">
-        <div class="g-thumb" style="background:linear-gradient(160deg,#4ad8d0,#7b6dff)">Minecraft</div>
-        <div class="g-body"><strong>Minecraft</strong><span class="pill">NIEUW!! Speel nu</span></div>
-      </a>
-
-      <!-- Market simulator -->
-      <a class="game-btn" href="market/" role="button" aria-label="Open Market simulator">
-        <div class="g-thumb" style="background:linear-gradient(160deg,#ffe36d,#ff9f4d)">Market simulator</div>
-        <div class="g-body"><strong>Market simulator</strong><span class="pill">Nu open</span></div>
-      </a>
-
-      <!-- Verwijderd: Plinko, The Cube, Roulette -->
-    </section>
-  </main>
-
-  <!-- ✅ STREAK MODAL -->
-  <div id="streakModal" aria-hidden="true">
-    <div class="streak-backdrop"></div>
-    <div class="streak-card" role="dialog" aria-modal="true" aria-labelledby="streakTitle">
-      <div class="streak-badge-card"><span id="streakFlame">🔥</span></div>
-      <h2 id="streakTitle">Dagelijkse Streak</h2>
-      <p class="streak-sub">Vandaag is dag <strong id="streakDays">1</strong> van je streak!</p>
-      <div class="streak-reward">
-        <div class="reward-amount">+<span id="streakReward">10</span> coins</div>
-        <p class="reward-note" id="streakNote"></p>
-      </div>
-      <div id="milestoneBanner" style="display:none;margin:8px 0 0;font-weight:800">🏆 Mijlpaal!</div>
-      <button id="streakClose" class="streak-btn">Nice!</button>
-      <canvas id="confettiCanvas"></canvas>
-    </div>
+  <!-- Fallback als iframe niet geladen mag worden -->
+  <div id="fallback" class="fallback">
+    <p>De site kan niet in een embed geladen worden.</p>
+    <p>
+      Klik hier om hem te openen:  
+      <a href="https://sgdclive.lovable.app" style="color:#3b82f6;">Open site</a>
+    </p>
   </div>
 
   <script>
-    // ===== Coins header koppelen + smooth oplopen en +X badge =====
-    (function(){
-      const bitsSpan = document.getElementById('bitsValue');
-      const badge = document.getElementById('bitsDelta');
-      if (!bitsSpan || !badge) return;
+    // Detecteer of de embed geblokkeerd wordt (veilig fallback)
+    const iframe = document.getElementById("embedFrame");
 
-      let raf;
-      function lerp(a,b,t){ return a + (b-a)*t; }
-      function animateTo(target, ms=650){
-        cancelAnimationFrame(raf);
-        const startVal = Number(bitsSpan.textContent||'0');
-        const start = performance.now();
-        (function frame(t){
-          const k = Math.min(1, (t-start)/ms);
-          const eased = k<.5 ? 2*k*k : -1+(4-2*k)*k; // easeInOutQuad
-          const v = Math.round(lerp(startVal, target, eased));
-          bitsSpan.textContent = v;
-          if (k<1) raf = requestAnimationFrame(frame);
-        })(performance.now());
+    iframe.onerror = () => {
+      document.getElementById("embedFrame").style.display = "none";
+      document.getElementById("fallback").style.display = "flex";
+    };
+
+    // Sommige browsers blokkeren zonder error → kleine check
+    setTimeout(() => {
+      try {
+        const test = iframe.contentWindow.location;
+      } catch {
+        iframe.style.display = "none";
+        document.getElementById("fallback").style.display = "flex";
       }
-      function flashPlus(amount){
-        if (amount<=0) return;
-        badge.textContent = `+${amount} Coins`;
-        badge.classList.add('show');
-        setTimeout(()=>badge.classList.remove('show'), 1400);
-      }
-      // Koppel aan onderliggende Bits store (blijft bestaan)
-      try{
-        Bits.onChange(v => animateTo(v, 650));
-        // helper voor streak-script
-        window.__bitsFlash = flashPlus;
-      }catch(e){
-        console.warn('Bits.onChange niet beschikbaar', e);
-      }
-    })();
+    }, 1500);
   </script>
 
-  <script>
-    // ===== Streak + beloningsengine + confetti + header-badge =====
-    (function(){
-      const LS_STREAK='sgdc.streak';
-      const LS_LAST='sgdc.streak.lastDate';
-      const LS_LAST_COIN='sgdc.market.lastCoin';
-      const LS_MARKET_VISIT='sgdc.market.visitDate';
-      const tz='Europe/Amsterdam';
-
-      const fmt = new Intl.DateTimeFormat('nl-NL',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'});
-      const keyOf = (d=new Date())=>{
-        const p = fmt.formatToParts(d).reduce((a,x)=>(a[x.type]=x.value,a),{});
-        return `${p.year}-${p.month}-${p.day}`;
-      };
-      const toMs = k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d).getTime();};
-      const isNext = (prev,now)=> prev!==now && Math.round((toMs(now)-toMs(prev))/86400000)===1;
-
-      // Header streak badge
-      const headerStreakVal = document.getElementById('headerStreakVal');
-      function setHeaderStreak(n){ if(headerStreakVal) headerStreakVal.textContent = `x${n}`; }
-
-      // Modal refs
-      const modal = document.getElementById('streakModal');
-      const daysEl = document.getElementById('streakDays');
-      const rewardEl = document.getElementById('streakReward');
-      const noteEl = document.getElementById('streakNote');
-      const closeBtn = document.getElementById('streakClose');
-      const banner = document.getElementById('milestoneBanner');
-      const canvas = document.getElementById('confettiCanvas');
-
-      function startConfetti(canvas, duration=1600, density=80){
-        const ctx = canvas.getContext('2d'),
-              W = canvas.width = canvas.offsetWidth,
-              H = canvas.height = canvas.offsetHeight;
-        const pieces = Array.from({length:density},()=>({
-          x:Math.random()*W,y:-10-Math.random()*H,s:4+Math.random()*6,v:1+Math.random()*2,
-          rot:Math.random()*Math.PI,vr:(Math.random()-.5)*0.2
-        }));
-        let start=null, raf;
-        function frame(ts){
-          if(!start) start = ts;
-          const t = ts-start;
-          ctx.clearRect(0,0,W,H);
-          for(const p of pieces){
-            p.y+=p.v; p.rot+=p.vr;
-            ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
-            ctx.fillStyle = ['#8a7cff','#50e3c2','#f4b73b','#e8ecff'][p.s % 4];
-            ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);
-            ctx.restore();
-            if(p.y>H+20){p.y=-20;p.x=Math.random()*W;}
-          }
-          if(t<duration){ raf=requestAnimationFrame(frame); }
-        }
-        raf=requestAnimationFrame(frame);
-        setTimeout(()=>cancelAnimationFrame(raf), duration+200);
-      }
-
-      function openModal(days, reward, note, confettiMs=1600, confettiN=80){
-        daysEl.textContent = days;
-        rewardEl.textContent = reward;
-        noteEl.textContent = note || 'Kom morgen terug voor een hogere beloning.';
-        banner.style.display='none';
-        modal.classList.add('show');
-        canvas.width = modal.clientWidth; canvas.height = modal.clientHeight;
-        startConfetti(canvas, confettiMs, confettiN);
-        closeBtn.focus();
-      }
-      function openMilestone(days, reward, label, confettiMs=2600, confettiN=140){
-        openModal(days, reward, label, confettiMs, confettiN);
-        banner.style.display='block';
-      }
-      function closeModal(){ modal.classList.remove('show'); }
-      closeBtn.addEventListener('click', closeModal);
-      modal.addEventListener('click', e=>{ if(e.target===modal||e.target.classList.contains('streak-backdrop')) closeModal(); });
-      document.addEventListener('keydown', e=>{ if(e.key==='Escape'&&modal.classList.contains('show')) closeModal(); });
-
-      // Beloningslogica
-      function baseBetween1to20(day){
-        const cycleBoost = Math.min(12, Math.floor(((day-1)%7))*2); // 0..12
-        const rand = Math.floor(Math.random()*4); // 0..3
-        const base = 5 + cycleBoost + rand;       // 5..20
-        return Math.max(1, Math.min(20, base));
-      }
-      function weeklyBonus(day){ return day%7===0 ? 10 : 0; }
-      function milestoneBonus(day){
-        if(day===30) return 20;
-        if(day===50) return 30;
-        return 0;
-      }
-      function marketBonus(todayKey){
-        const vDate = localStorage.getItem('sgdc.market.visitDate');
-        return (vDate===todayKey) ? 3 : 0;
-      }
-      function computeReward(day, todayKey){
-        if(day===100) return 100; // hard cap
-        return baseBetween1to20(day) + weeklyBonus(day) + milestoneBonus(day) + marketBonus(todayKey);
-      }
-      function flavorNote(day, todayKey){
-        const coin = localStorage.getItem(LS_LAST_COIN);
-        const bits = [];
-        if(day%7===0) bits.push('🎉 Weekbonus');
-        if(day===30) bits.push('🥇 30-dagen mijlpaal');
-        if(day===50) bits.push('🏅 50-dagen mijlpaal');
-        if(localStorage.getItem(LS_MARKET_VISIT)===todayKey) bits.push('📈 Markt-bonus');
-        if(day===100) return '💯 Dag 100 — Legend status!';
-
-        const reason = bits.length ? `(${bits.join(' · ')})` : '';
-        if(coin) return `📊 Jij keek vandaag naar ${coin}. ${reason}`.trim();
-        return reason || 'Kom morgen terug voor een hogere beloning.';
-      }
-
-      // Streak state
-      const todayKey = keyOf();
-      const lastKey = localStorage.getItem(LS_LAST);
-      let streak = parseInt(localStorage.getItem(LS_STREAK)||'0',10);
-      if(Number.isNaN(streak)) streak = 0;
-
-      // update header badge met huidige (voor tonen)
-      setHeaderStreak(streak || 0);
-
-      let isNew=false;
-      if(!lastKey){ streak=1; isNew=true; }
-      else if(lastKey===todayKey){ isNew=false; }
-      else if(isNext(lastKey,todayKey)){ streak+=1; isNew=true; }
-      else { streak=1; isNew=true; }
-
-      if(isNew){
-        const reward = computeReward(streak, todayKey);
-        const note = flavorNote(streak, todayKey);
-
-        // Coins via onderliggende Bits-store
-        try{ Bits.add(reward); }catch(e){ console.warn('Bits.add niet beschikbaar', e); }
-        if (window.__bitsFlash) window.__bitsFlash(reward);
-
-        // Modal types
-        if(streak===100){
-          openMilestone(streak, reward, '💯 Dag 100 — Legend status! 100 coins geclaimd!', 3600, 200);
-        }else if(streak%7===0 || streak===30 || streak===50){
-          openMilestone(streak, reward, note, 2400, 140);
-        }else{
-          openModal(streak, reward, note, 1600, 90);
-        }
-
-        // Save + header badge bijwerken
-        localStorage.setItem(LS_STREAK, String(streak));
-        localStorage.setItem(LS_LAST, todayKey);
-        setHeaderStreak(streak);
-      } else {
-        // geen claim vandaag → alsnog header syncen met bewaarde streak
-        setHeaderStreak(streak);
-      }
-    })();
-  </script>
-
-  <!-- Coins aan header koppeling als fallback (als Bits.onChange mist, initialiseer waarde) -->
-  <script>
-    (function initCoinsHeader(){
-      const el = document.getElementById('bitsValue');
-      if(!el) return;
-      try{
-        if (typeof Bits?.get === 'function') {
-          el.textContent = Bits.get();
-        }
-      }catch(e){}
-    })();
-  </script>
 </body>
 </html>
