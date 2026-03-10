@@ -1,79 +1,82 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Lucas M portfolio</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site temporarily unavailable</title>
   <style>
-    html, body {
+    * {
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      font-family: sans-serif;
+      box-sizing: border-box;
     }
 
-    iframe {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      border: none;
-    }
-
-    .fallback {
-      position: fixed;
-      inset: 0;
-      background: #0a0a0a;
-      color: white;
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
+      color: white;
       padding: 20px;
-      font-size: 1.2rem;
-      display: none;
+    }
+
+    .card {
+      max-width: 700px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.88);
+      margin-bottom: 14px;
+    }
+
+    .signature {
+      margin-top: 25px;
+      font-weight: bold;
+      color: #cbd5e1;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-
-  <iframe
-    src="https://lucasportfoli.lovable.app"
-    id="embedFrame"
-  ></iframe>
-
-  <!-- Fallback als iframe niet geladen mag worden -->
-  <div id="fallback" class="fallback">
-    <p>De site kan niet in een embed geladen worden.</p>
+  <div class="card">
+    <h1>Sorry, the website is currently being updated</h1>
     <p>
-      Klik hier om hem te openen:  
-      <a href="https://lucasmangroelal.nl" style="color:#3b82f6;">Open site</a>
+      I am currently moving some core components that cannot be saved as a draft.
     </p>
+    <p>
+      The site will be back online in a few hours. 
+    </p>
+    <p class="signature">— Lucas Mangroelal</p>
   </div>
-
-  <script>
-    // Detecteer of de embed geblokkeerd wordt (veilig fallback)
-    const iframe = document.getElementById("embedFrame");
-
-    iframe.onerror = () => {
-      document.getElementById("embedFrame").style.display = "none";
-      document.getElementById("fallback").style.display = "flex";
-    };
-
-    // Sommige browsers blokkeren zonder error → kleine check
-    setTimeout(() => {
-      try {
-        const test = iframe.contentWindow.location;
-      } catch {
-        iframe.style.display = "none";
-        document.getElementById("fallback").style.display = "flex";
-      }
-    }, 1500);
-  </script>
-
 </body>
 </html>
